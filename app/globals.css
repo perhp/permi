@@ -40,7 +40,8 @@
   * {
     @apply border-border;
   }
+
   body {
-    @apply bg-background text-foreground;
+    @apply flex flex-col bg-white text-foreground min-h-screen;
   }
 }
