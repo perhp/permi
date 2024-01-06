@@ -8,7 +8,7 @@ export default function Header() {
         <div className="flex items-center font-bold gap-1.5">
           <SatelliteDish className="w-5 h-5" /> <span className="hidden sm:inline">permi</span>
         </div>
-        <nav className="pr-5">
+        <nav>
           <ul className="flex gap-5 items-center">
             <NavLink href="/">Latest pass</NavLink>
             <NavLink href="/all-passes">All passes</NavLink>

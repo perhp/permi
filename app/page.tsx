@@ -26,7 +26,7 @@ export default async function Page() {
     <main className="container py-20">
       <h1 className="text-sm text-gray-600">{format(latestPass.pass_start, "dd. MMM @ HH:mm")}</h1>
       <h2 className="text-4xl font-bold">{satelliteName}</h2>
-      <div className="grid grid-cols-5 gap-5 mt-5">
+      <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-5 mt-5">
         {images.map((image) => (
           <img key={image.id} src={`${CDN_URL}/images/${image.path}`} alt="" className="rounded-md" />
         ))}
