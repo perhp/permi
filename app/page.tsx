@@ -6,6 +6,7 @@ import ImagesCarousel from "./_components/images-carousel";
 
 const excludeImages = ["spectrogram", "polar-direction", "polar-azel", "histogram"];
 
+export const revalidate = 300;
 export default async function Page() {
   const { data: passes } = await supabaseServiceClient
     .from("passes")
@@ -17,15 +18,15 @@ export default async function Page() {
     )
     .order("created_at", { ascending: false });
 
-  if (!passes) {
+  if (!passes || passes.length === 0) {
     throw new Error("No passes found");
   }
 
   const [latestPass] = passes;
   const { images, gain, pass_start } = latestPass;
   const [satelliteIdentifier, satelitteNumber] = images[0].path.split("-");
-  const satelliteName = latestPass.is_noaa ? `${satelliteIdentifier} ${satelitteNumber}` : "Meteor M2-3";
 
+  const satelliteName = latestPass.is_noaa ? `${satelliteIdentifier} ${satelitteNumber}` : "Meteor M2-3";
   const spectrogram = images.find((image) => image.path.includes("spectrogram"));
   const polarDirection = images.find((image) => image.path.includes("polar-direction"));
   const polarAzEl = images.find((image) => image.path.includes("polar-azel"));
