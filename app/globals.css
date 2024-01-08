@@ -42,6 +42,6 @@
   }
 
   body {
-    @apply flex flex-col bg-white text-foreground min-h-screen;
+    @apply flex flex-col bg-white text-foreground min-h-screen overflow-y-scroll;
   }
 }
