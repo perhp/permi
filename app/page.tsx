@@ -11,7 +11,8 @@ export default async function Page() {
       has_histogram, is_meteor, has_spectrogram,
       images:passes_images(id, created_at, path)`
     )
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(1);
 
   if (!passes || passes.length === 0) {
     throw new Error("No passes found");
