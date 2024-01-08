@@ -1,12 +1,13 @@
 import { Badge } from "@/components/ui/badge";
 import { CDN_URL } from "@/lib/cdn-url";
 import { cn } from "@/lib/utils";
+import { Pass } from "@/models/pass.model";
 import { format } from "date-fns";
 
 const graphs = ["spectrogram", "polar-direction", "polar-azel", "histogram"];
 
 type Props = {
-  pass: any;
+  pass: Pass;
 };
 
 export default function Pass({ pass }: Props) {
