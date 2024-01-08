@@ -23,12 +23,12 @@ export default function Pass({ pass }: Props) {
 
   return (
     <>
-      <div className="flex justify-between">
+      <div className="flex gap-5">
         <h1 className="text-sm font-medium text-gray-500">
           {format(pass_start, "dd. MMM @ HH:mm")} <br />
           <span className="text-4xl font-bold text-black">{satelliteName}</span>
         </h1>
-        <Badge variant="outline" className="mt-auto">
+        <Badge variant="outline" className="mt-auto mb-[7px]">
           Gain {gain}
         </Badge>
       </div>
@@ -42,7 +42,7 @@ export default function Pass({ pass }: Props) {
                 alt={image.path.split(".")[0].replace("-", " ")}
                 className={cn("rounded-lg mb-3", image.is_graph && "mix-blend-multiply")}
               />
-              <p className="text-lg font-light border-l border-gray-200 pl-5 mt-auto capitalize">
+              <p className="font-light pl-3 mt-auto capitalize">
                 {image.path
                   .replace(/(.jpg)|(.png)/g, "")
                   .split("-")
