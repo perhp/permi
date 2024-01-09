@@ -1,6 +1,11 @@
 import { supabaseServiceClient } from "@/lib/supabase";
 import { passQuery } from "@/queries/pass.query";
+import { Metadata } from "next";
 import PassesListItem from "./_components/passes-list-item";
+
+export const metadata: Metadata = {
+  title: "All Passes | permi",
+};
 
 export const revalidate = 300;
 export default async function Page() {

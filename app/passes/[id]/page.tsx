@@ -1,7 +1,12 @@
 import Pass from "@/app/_components/pass";
 import { supabaseServiceClient } from "@/lib/supabase";
 import { passQuery } from "@/queries/pass.query";
+import { Metadata } from "next";
 import { notFound } from "next/navigation";
+
+export const metadata: Metadata = {
+  title: "Pass | permi",
+};
 
 type Props = {
   params: { [key: string]: string };

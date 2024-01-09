@@ -1,6 +1,11 @@
 import { supabaseServiceClient } from "@/lib/supabase";
 import { passQuery } from "@/queries/pass.query";
+import { Metadata } from "next";
 import Pass from "./_components/pass";
+
+export const metadata: Metadata = {
+  title: "Latest Pass | permi",
+};
 
 export const revalidate = 300;
 export default async function Page() {
