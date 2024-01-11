@@ -9,5 +9,5 @@ export const getPassName = (path: Pass["images"][number]["path"], pass: Pass) =>
     return path.replace(replaceRegex, " ").split("-").slice(5).join(" ");
   }
 
-  return path;
+  return path.replace(replaceRegex, " ").split("-").join(" ");
 };
