@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { CDN_URL } from "@/lib/cdn-url";
 import { cn } from "@/lib/utils";
 import { Pass } from "@/models/pass.model";
+import { getPassName } from "@/utils/get-pass-name";
 import { format } from "date-fns";
 import { useState } from "react";
 
@@ -64,15 +65,7 @@ export default function Pass({ pass }: Props) {
                 alt={image.path.split(".")[0].replace("-", " ")}
                 className={cn("rounded-lg mb-3", image.is_graph && "mix-blend-multiply")}
               />
-              {!image.is_graph && (
-                <Badge className="absolute z-10 top-3 left-3 capitalize">
-                  {image.path
-                    .replace(/(.jpg)|(.png)/g, "")
-                    .split("-")
-                    .slice(4)
-                    .join(" ")}
-                </Badge>
-              )}
+              {!image.is_graph && <Badge className="absolute z-10 top-3 left-3 capitalize">{getPassName(image.path, pass)}</Badge>}
             </button>
           ))}
       </div>
