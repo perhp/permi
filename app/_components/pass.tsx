@@ -7,6 +7,7 @@ import { Pass } from "@/models/pass.model";
 import { getPassName } from "@/utils/get-pass-name";
 import { format } from "date-fns";
 import { useState } from "react";
+import { RemoveScrollBar } from "react-remove-scroll-bar";
 
 const graphs = ["spectrogram", "polar-direction", "polar-azel", "histogram"];
 
@@ -36,12 +37,10 @@ export default function Pass({ pass }: Props) {
 
   const selectActiveImage = (image: EnrichedPass["images"][number]) => () => {
     setActiveImage(image);
-    document.body.classList.add("overflow-hidden");
   };
 
   const deselectActiveImage = () => () => {
     setActiveImage(null);
-    document.body.classList.remove("overflow-hidden");
   };
 
   return (
@@ -70,16 +69,19 @@ export default function Pass({ pass }: Props) {
           ))}
       </div>
       {activeImage && (
-        <div
-          onClick={deselectActiveImage()}
-          className="fixed flex items-center justify-center w-full h-screen bg-black/20 z-20 top-0 left-0 p-5"
-        >
-          <img
-            src={`${CDN_URL}/images/${activeImage?.path}`}
-            alt={activeImage.path.split(".")[0].replace("-", " ")}
-            className="rounded-lg mb-3 max-h-full"
-          />
-        </div>
+        <>
+          <div
+            onClick={deselectActiveImage()}
+            className="fixed flex items-center justify-center w-full h-screen bg-black/20 z-20 top-0 left-0 p-5"
+          >
+            <img
+              src={`${CDN_URL}/images/${activeImage?.path}`}
+              alt={activeImage.path.split(".")[0].replace("-", " ")}
+              className="rounded-lg mb-3 max-h-full"
+            />
+          </div>
+          <RemoveScrollBar />
+        </>
       )}
     </>
   );
