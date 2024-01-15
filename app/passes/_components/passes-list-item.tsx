@@ -1,3 +1,5 @@
+"use client";
+
 import { Pass } from "@/models/pass.model";
 import { format } from "date-fns";
 import { ArrowRight } from "lucide-react";
