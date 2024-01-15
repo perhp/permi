@@ -72,7 +72,7 @@ export default function Pass({ pass }: Props) {
         <>
           <div
             onClick={deselectActiveImage()}
-            className="fixed flex items-center justify-center w-full h-screen bg-black/20 z-20 top-0 left-0 p-5"
+            className="fixed flex items-center justify-center w-full h-screen bg-white/20 z-20 top-0 left-0 p-5 backdrop-blur-sm"
           >
             <img
               src={`${CDN_URL}/images/${activeImage?.path}`}
