@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { Pass } from "@/models/pass.model";
 import { getPassName } from "@/utils/get-pass-name";
 import { format } from "date-fns";
+import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { RemoveScrollBar } from "react-remove-scroll-bar";
 
@@ -68,21 +69,31 @@ export default function Pass({ pass }: Props) {
             </button>
           ))}
       </div>
-      {activeImage && (
-        <>
-          <div
-            onClick={deselectActiveImage()}
-            className="fixed flex items-center justify-center w-full h-screen bg-white/20 z-20 top-0 left-0 p-5 backdrop-blur-sm"
-          >
-            <img
-              src={`${CDN_URL}/images/${activeImage?.path}`}
-              alt={activeImage.path.split(".")[0].replace("-", " ")}
-              className="rounded-lg mb-3 max-h-full"
-            />
-          </div>
-          <RemoveScrollBar />
-        </>
-      )}
+      <AnimatePresence>
+        {activeImage && (
+          <>
+            <motion.div
+              animate={{ scale: 1, opacity: 1 }}
+              initial={{ opacity: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              onClick={deselectActiveImage()}
+              className="fixed flex items-center justify-center w-full h-screen bg-white/20 z-20 top-0 left-0 p-5 backdrop-blur-sm"
+            >
+              <motion.img
+                animate={{ scale: 1 }}
+                initial={{ scale: 0.9 }}
+                exit={{ scale: 0.9 }}
+                transition={{ duration: 0.1 }}
+                src={`${CDN_URL}/images/${activeImage?.path}`}
+                alt={activeImage.path.split(".")[0].replace("-", " ")}
+                className="rounded-lg mb-3 max-h-full select-none"
+              />
+            </motion.div>
+            <RemoveScrollBar />
+          </>
+        )}
+      </AnimatePresence>
     </>
   );
 }
