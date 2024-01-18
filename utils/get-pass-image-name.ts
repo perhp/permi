@@ -1,6 +1,6 @@
 import { Pass } from "@/models/pass.model";
 
-export const getPassName = (path: Pass["images"][number]["path"], pass: Pass) => {
+export const getPassImageName = (path: Pass["images"][number]["path"], pass: Pass) => {
   const replaceRegex = /(.jpg)|(.png)|(_)/g;
 
   if (pass.is_noaa) {

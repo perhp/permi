@@ -34,15 +34,21 @@ export default async function Page({ searchParams }: Props) {
     supabaseServiceClient.from("passes").select("count", { count: "exact" }),
   ]);
 
-  const totalPages = Math.ceil(count! / pageSize);
-
-  if (!passes || passes.length === 0) {
+  if (!passes || passes.length === 0 || count === null) {
     throw new Error("No passes found");
   }
 
+  const totalPages = Math.ceil(count / pageSize);
+
   return (
     <main className="container py-16">
-      <ul className="grid grid-cols-4 gap-8">
+      <div className="flex flex-col gap-2 md:gap-5 md:flex-row">
+        <h1 className="text-sm font-medium text-gray-500">
+          {count} passes <br />
+          <span className="text-4xl font-bold text-black">All passes</span>
+        </h1>
+      </div>
+      <ul className="grid grid-cols-4 gap-8 mt-5">
         {passes.map((pass) => (
           <PassesListItem key={pass.id} pass={pass} />
         ))}

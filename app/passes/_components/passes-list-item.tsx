@@ -2,6 +2,8 @@
 
 import { CDN_URL } from "@/lib/cdn-url";
 import { Pass } from "@/models/pass.model";
+import { getImagesWithoutGraphs } from "@/utils/get-images-without-graphs";
+import { getSatelitteName } from "@/utils/get-satellite-name";
 import { format } from "date-fns";
 import Image from "next/image";
 import Link from "next/link";
@@ -12,16 +14,17 @@ type Props = {
 };
 
 export default function PassesListItem({ pass }: Props) {
-  const [satelliteIdentifier, satelitteNumber] = pass.images[0].path.split("-");
-  const satelliteName = pass.is_noaa ? `${satelliteIdentifier} ${satelitteNumber}` : "Meteor M2-3";
+  const satelliteName = getSatelitteName(pass);
   const [imageIndex, setImageIndex] = useState<number>(0);
+
+  const imagesWithoutGraphs = getImagesWithoutGraphs(pass.images);
 
   return (
     <li key={pass.id}>
       <Link href={`/passes/${pass.id}`} className="flex flex-col">
         <div className="relative flex h-96">
           <Image
-            src={`${CDN_URL}/images/${pass.images[imageIndex]!.path}`}
+            src={`${CDN_URL}/images/${imagesWithoutGraphs[imageIndex].path}`}
             alt={pass.images[0]!.path.split(".")[0].replace("-", " ")}
             width={300}
             height={300}

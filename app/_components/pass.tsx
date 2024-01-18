@@ -4,13 +4,14 @@ import { Badge } from "@/components/ui/badge";
 import { CDN_URL } from "@/lib/cdn-url";
 import { cn } from "@/lib/utils";
 import { Pass } from "@/models/pass.model";
-import { getPassName } from "@/utils/get-pass-name";
+import { getImagesOfGraphs } from "@/utils/get-images-of-graphs";
+import { getImagesWithoutGraphs } from "@/utils/get-images-without-graphs";
+import { getPassImageName } from "@/utils/get-pass-image-name";
+import { getSatelitteName } from "@/utils/get-satellite-name";
 import { format } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { RemoveScrollBar } from "react-remove-scroll-bar";
-
-const graphs = ["spectrogram", "polar-direction", "polar-azel", "histogram"];
 
 interface EnrichedPass extends Pass {
   images: (Pass["images"][number] & {
@@ -23,16 +24,14 @@ type Props = {
 };
 
 export default function Pass({ pass }: Props) {
-  const { images, gain, pass_start, is_noaa } = pass;
-  const [satelliteIdentifier, satelitteNumber] = images[0].path.split("-");
+  const { images, gain, pass_start } = pass;
 
-  const satelliteName = is_noaa ? `${satelliteIdentifier} ${satelitteNumber}` : "Meteor M2-3";
-  const imagesWithoutGraphs: EnrichedPass["images"] = images
-    .filter((image: any) => !graphs.some((graph) => image.path.includes(graph)))
-    .map((image: any) => ({ ...image, is_graph: false }));
-  const imagesOfGraphs: EnrichedPass["images"] = images
-    .filter((image: any) => graphs.some((graph) => image.path.includes(graph)))
-    .map((image: any) => ({ ...image, is_graph: true }));
+  const satelliteName = getSatelitteName(pass);
+  const imagesWithoutGraphs: EnrichedPass["images"] = getImagesWithoutGraphs(images).map((image: any) => ({
+    ...image,
+    is_graph: false,
+  }));
+  const imagesOfGraphs: EnrichedPass["images"] = getImagesOfGraphs(images).map((image: any) => ({ ...image, is_graph: true }));
 
   const [activeImage, setActiveImage] = useState<EnrichedPass["images"][number] | null>(null);
 
@@ -65,7 +64,7 @@ export default function Pass({ pass }: Props) {
                 alt={image.path.split(".")[0].replace("-", " ")}
                 className={cn("rounded-lg mb-3", image.is_graph && "mix-blend-multiply")}
               />
-              {!image.is_graph && <Badge className="absolute z-10 top-3 left-3 capitalize">{getPassName(image.path, pass)}</Badge>}
+              {!image.is_graph && <Badge className="absolute z-10 top-3 left-3 capitalize">{getPassImageName(image.path, pass)}</Badge>}
             </button>
           ))}
       </div>
