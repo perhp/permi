@@ -31,7 +31,7 @@ export default function PassesListItem({ pass }: Props) {
             className="w-full h-full object-cover rounded-xl"
           />
           <div className="flex absolute inset-0">
-            {pass.images.map((image, i) => (
+            {imagesWithoutGraphs.map((image, i) => (
               <div key={image.id} onMouseEnter={() => setImageIndex(i)} className="h-full w-full" />
             ))}
           </div>
