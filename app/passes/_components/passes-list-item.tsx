@@ -22,7 +22,7 @@ export default function PassesListItem({ pass }: Props) {
   return (
     <li key={pass.id}>
       <Link href={`/passes/${pass.id}`} className="flex flex-col">
-        <div className="relative flex h-96">
+        <div className="relative flex h-52 md:h-72 lg:h-80">
           <Image
             src={`${CDN_URL}/images/${imagesWithoutGraphs[imageIndex].path}`}
             alt={pass.images[0]!.path.split(".")[0].replace("-", " ")}
