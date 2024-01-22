@@ -1,6 +1,7 @@
 import {
   Pagination,
   PaginationContent,
+  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
@@ -39,6 +40,10 @@ export default async function Page({ searchParams }: Props) {
   }
 
   const totalPages = Math.ceil(count / pageSize);
+  const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+  const before = pages.slice(0, 2);
+  const after = pages.slice(totalPages - 2, totalPages);
+  console.log(before);
 
   return (
     <main className="container py-16">
@@ -61,9 +66,37 @@ export default async function Page({ searchParams }: Props) {
               className={cn(page - 1 < 1 && "pointer-events-none opacity-50")}
             />
           </PaginationItem>
-          {Array.from({ length: totalPages }, (_, i) => (
-            <PaginationItem key={i}>
-              <PaginationLink href={i === 0 ? "/passes" : `?page=${i + 1}`}>{i + 1}</PaginationLink>
+          {before.map((p) => (
+            <PaginationItem key={p}>
+              <PaginationLink href={p === 1 ? "/passes" : `?page=${p}`} className={cn(p === page && "bg-gray-100")}>
+                {p}
+              </PaginationLink>
+            </PaginationItem>
+          ))}
+          {page > 3 && (
+            <PaginationItem>
+              <PaginationEllipsis />
+            </PaginationItem>
+          )}
+          {page > 2 && page < totalPages - 1 && (
+            <>
+              <PaginationItem key={page}>
+                <PaginationLink href={`?page=${page}`} className="bg-gray-100">
+                  {page}
+                </PaginationLink>
+              </PaginationItem>
+            </>
+          )}
+          {page < totalPages - 2 && (
+            <PaginationItem>
+              <PaginationEllipsis />
+            </PaginationItem>
+          )}
+          {after.map((p) => (
+            <PaginationItem key={p}>
+              <PaginationLink href={p === 1 ? "/passes" : `?page=${p}`} className={cn(p === page && "bg-gray-100")}>
+                {p}
+              </PaginationLink>
             </PaginationItem>
           ))}
           <PaginationItem>

@@ -1,3 +1,5 @@
+"use client";
+
 import { CDN_URL } from "@/lib/cdn-url";
 import { Pass } from "@/models/pass.model";
 import { getImagesWithoutGraphs } from "@/utils/get-images-without-graphs";
