@@ -43,7 +43,6 @@ export default async function Page({ searchParams }: Props) {
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
   const before = pages.slice(0, 2);
   const after = pages.slice(totalPages - 2, totalPages);
-  console.log(before);
 
   return (
     <main className="container py-16">
