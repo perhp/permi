@@ -3,7 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { CDN_URL } from "@/lib/cdn-url";
 import { cn } from "@/lib/utils";
-import { Pass } from "@/models/pass.model";
+import { Pass as PassModel } from "@/models/pass.model";
 import { getImagesOfGraphs } from "@/utils/get-images-of-graphs";
 import { getImagesWithoutGraphs } from "@/utils/get-images-without-graphs";
 import { getPassImageName } from "@/utils/get-pass-image-name";
@@ -13,14 +13,14 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { RemoveScrollBar } from "react-remove-scroll-bar";
 
-interface EnrichedPass extends Pass {
-  images: (Pass["images"][number] & {
+interface EnrichedPass extends PassModel {
+  images: (PassModel["images"][number] & {
     is_graph: boolean;
   })[];
 }
 
 type Props = {
-  pass: Pass;
+  pass: PassModel;
 };
 
 export default function Pass({ pass }: Props) {
