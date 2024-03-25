@@ -50,7 +50,7 @@ export default function Pass({ pass }: Props) {
           {format(pass_start, "dd. MMM @ HH:mm")} <br />
           <span className="text-4xl font-bold text-black">{satelliteName}</span>
         </h1>
-        <Badge variant="outline" className="mt-auto mb-[6px] w-min whitespace-nowrap">
+        <Badge variant="outline" className="mt-auto mb-[6px] w-min whitespace-nowrap bg-white">
           Gain {gain}
         </Badge>
       </div>
