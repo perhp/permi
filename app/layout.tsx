@@ -8,7 +8,7 @@ import "./globals.css";
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={cn("relative overflow-x-hidden", GeistSans.className)}>
+      <body className={cn("relative", GeistSans.className)}>
         <Header />
         <Meteors number={20} />
         {children}
