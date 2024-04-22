@@ -30,7 +30,7 @@ export default async function Page({ searchParams }: Props) {
     supabaseServiceClient
       .from("passes")
       .select(passQuery)
-      .order("created_at", { ascending: false })
+      .order("pass_start", { ascending: false })
       .range(page * pageSize - pageSize, page * pageSize - 1),
     supabaseServiceClient.from("passes").select("count", { count: "exact" }),
   ]);
