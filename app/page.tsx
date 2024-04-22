@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: "Latest Pass | permi",
 };
 
-export const revalidate = 300;
+export const revalidate = 0;
 export default async function Page() {
   const { data: passes } = await supabaseServiceClient.from("passes").select(passQuery).order("created_at", { ascending: false }).limit(1);
   if (!passes || passes.length === 0) {
