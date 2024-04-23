@@ -56,7 +56,7 @@ export default function Pass({ pass }: Props) {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mt-5">
         {[...imagesWithoutGraphs, ...imagesOfGraphs]
-          .sort((a, b) => +b.created_at - +a.created_at)
+          .sort((a, b) => getPassImageName(a.path, pass).localeCompare(getPassImageName(b.path, pass)))
           .map((image) => (
             <button key={image.id} onClick={selectActiveImage(image)} className="relative flex h-96">
               <div className="absolute inset-0 bg-gray-100 -z-10 animate-pulse rounded-lg" />
