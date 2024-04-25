@@ -11,8 +11,6 @@ export default function Header() {
         </Link>
         <nav>
           <ul className="flex gap-5 items-center">
-            <NavLink href="/">Latest pass</NavLink>
-            <NavLink href="/passes">All passes</NavLink>
             <NavLink href="https://github.com/perhp/permi" target="_blank" className="bg-gray-100 hover:bg-gray-100/75 p-2 rounded-full">
               <Github className="w-5 h-5" />
             </NavLink>
