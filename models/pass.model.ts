@@ -11,5 +11,10 @@ export interface Pass {
   has_histogram: boolean;
   is_meteor: boolean;
   has_spectrogram: boolean;
+  direction: string;
+  azimuth_at_max: number;
+  pass_end: number;
+  pass_start_azimuth: number;
+  max_elevation: number;
   images: { id: number; created_at: Date; path: string }[];
 }
