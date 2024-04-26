@@ -53,15 +53,21 @@ export default function Pass({ pass }: Props) {
         <Badge variant="outline" className="mt-auto mb-[6px] w-min whitespace-nowrap bg-white">
           {gain} gain
         </Badge>
-        <Badge variant="outline" className="mt-auto mb-[6px] w-min whitespace-nowrap bg-white">
-          {direction}
-        </Badge>
-        <Badge variant="outline" className="mt-auto mb-[6px] w-min whitespace-nowrap bg-white">
-          {azimuth_at_max}° azimuth
-        </Badge>
-        <Badge variant="outline" className="mt-auto mb-[6px] w-min whitespace-nowrap bg-white">
-          {max_elevation}° max elevation
-        </Badge>
+        {direction && (
+          <Badge variant="outline" className="mt-auto mb-[6px] w-min whitespace-nowrap bg-white">
+            {direction}
+          </Badge>
+        )}
+        {azimuth_at_max && (
+          <Badge variant="outline" className="mt-auto mb-[6px] w-min whitespace-nowrap bg-white">
+            {azimuth_at_max}° azimuth
+          </Badge>
+        )}
+        {max_elevation && (
+          <Badge variant="outline" className="mt-auto mb-[6px] w-min whitespace-nowrap bg-white">
+            {max_elevation}° max elevation
+          </Badge>
+        )}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mt-5">
         {[...imagesWithoutGraphs, ...imagesOfGraphs]
