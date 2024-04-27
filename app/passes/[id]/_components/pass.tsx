@@ -24,7 +24,7 @@ type Props = {
 };
 
 export default function Pass({ pass }: Props) {
-  const { images, gain, pass_start, direction, azimuth_at_max, max_elevation } = pass;
+  const { images, gain, pass_start, direction, azimuth_at_max, max_elevation, pass_start_azimuth } = pass;
 
   const satelliteName = getSatelitteName(pass);
   const imagesWithoutGraphs: EnrichedPass["images"] = getImagesWithoutGraphs(images).map((image: any) => ({
@@ -58,9 +58,14 @@ export default function Pass({ pass }: Props) {
             {direction}
           </Badge>
         )}
+        {pass_start_azimuth && (
+          <Badge variant="outline" className="mt-auto mb-[6px] w-min whitespace-nowrap bg-white">
+            {pass_start_azimuth}° azimuth at start
+          </Badge>
+        )}
         {azimuth_at_max && (
           <Badge variant="outline" className="mt-auto mb-[6px] w-min whitespace-nowrap bg-white">
-            {azimuth_at_max}° azimuth
+            {azimuth_at_max}° azimuth at max
           </Badge>
         )}
         {max_elevation && (
