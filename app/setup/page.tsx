@@ -52,7 +52,7 @@ export default async function Page() {
               <Feature>
                 <FeatureTitle>
                   <PcCase className="absolute top-1 left-1 w-5 h-5 mr-2 text-primary" />
-                  Raspberry 4b.
+                  Raspberry Pi 4b.
                 </FeatureTitle>
                 <FeatureContent>
                   The Raspberry Pi 4b is the heart of my setup, running{" "}
