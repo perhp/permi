@@ -1,4 +1,4 @@
-import Pass from "@/app/passes/[id]/_components/pass";
+import Pass from "@/app/(default)/passes/[id]/_components/pass";
 import { supabaseServiceClient } from "@/lib/supabase";
 import { passQuery } from "@/queries/pass.query";
 import { Metadata } from "next";

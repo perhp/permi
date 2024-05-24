@@ -11,7 +11,7 @@ import { supabaseServiceClient } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 import { passQuery } from "@/queries/pass.query";
 import { Metadata } from "next";
-import PassesListItem from "./_components/passes-list-item";
+import PassesListItem from "../_components/passes-list-item";
 
 export const metadata: Metadata = {
   title: "All Passes | permi",
