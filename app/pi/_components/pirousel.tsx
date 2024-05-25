@@ -3,6 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Carousel, CarouselApi, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import { CDN_URL } from "@/lib/cdn-url";
+import { cn } from "@/lib/utils";
 import { Pass } from "@/models/pass.model";
 import { getPassImageName } from "@/utils/get-pass-image-name";
 import { getSatelitteName } from "@/utils/get-satellite-name";
@@ -10,8 +11,9 @@ import { format } from "date-fns";
 import Autoplay from "embla-carousel-autoplay";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { SatelliteSeries } from "../_enums/series";
 
 type Props = {
   latestPass: Pass;
@@ -20,6 +22,7 @@ type Props = {
 export const revalidate = 0;
 export default function Pirousel({ latestPass }: Props) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [carousel, setCarousel] = useState<CarouselApi>();
 
   useEffect(() => {
@@ -32,13 +35,8 @@ export default function Pirousel({ latestPass }: Props) {
 
   const satelliteName = getSatelitteName(latestPass);
 
-  const next = () => {
-    carousel?.scrollNext();
-  };
-
-  const previous = () => {
-    carousel?.scrollPrev();
-  };
+  const currentSeries = searchParams.get("series") as SatelliteSeries;
+  const currentPage = Number(searchParams.get("page")) || 1;
 
   return (
     <>
@@ -53,8 +51,8 @@ export default function Pirousel({ latestPass }: Props) {
       >
         <CarouselContent>
           {latestPass.images.map((image) => (
-            <CarouselItem key={image.id} className="relative flex justify-center">
-              <img src={`${CDN_URL}/images/${image.path}`} alt={image.path} className="object-top max-h-screen" />
+            <CarouselItem key={image.id} className="relative flex justify-center items-center">
+              <img src={`${CDN_URL}/images/${image.path}`} alt={image.path} className="object-contain h-screen" />
               <Badge className="absolute top-5 left-5 bg-white/5 border border-white/5 backdrop-blur">
                 {getPassImageName(image.path, latestPass)}
               </Badge>
@@ -64,32 +62,47 @@ export default function Pirousel({ latestPass }: Props) {
       </Carousel>
       <div className="fixed z-20 bottom-5 inset-x-5 border text-white border-white/5 bg-white/5 rounded-lg backdrop-blur">
         <div className="border-b border-white/5 py-3 flex">
-          <button onClick={previous} className="h-full flex items-center p-3">
+          <Link
+            href={{ pathname: "/pi", query: { ...(currentSeries && { series: currentSeries }), page: Math.max(1, currentPage - 1) } }}
+            className="h-full flex items-center p-3"
+          >
             <ChevronLeftIcon className="w-4 h-4" />
-          </button>
+          </Link>
           <div className="flex flex-col w-full items-center">
             <p className="text-white/60 text-xs">{format(latestPass.pass_start, "dd. MMM @ HH:mm")}</p>
             <p className="font-medium">{satelliteName}</p>
           </div>
-          <button onClick={next} className="h-full flex items-center p-3">
+          <Link
+            href={{ pathname: "/pi", query: { ...(currentSeries && { series: currentSeries }), page: currentPage + 1 } }}
+            className="h-full flex items-center p-3"
+          >
             <ChevronRightIcon className="w-4 h-4" />
-          </button>
+          </Link>
         </div>
         <div className="flex">
           <Link
-            href={{ pathname: "/pi", query: { series: "noaa" } }}
-            className="font-light text-xs flex-1 p-3 border-r border-white/5 text-center"
+            href={{ pathname: "/pi", query: { page: 1, series: SatelliteSeries.NOAA } }}
+            className={cn(
+              searchParams.get("series") === SatelliteSeries.NOAA && "bg-white/10",
+              "font-light text-xs flex-1 p-3 border-r border-white/5 text-center"
+            )}
           >
-            Latest NOAA
+            NOAA
           </Link>
           <Link
-            href={{ pathname: "/pi", query: { series: "meteor" } }}
-            className="border-r border-white/5 font-light text-xs flex-1 p-3 text-center"
+            href={{ pathname: "/pi", query: { page: 1, series: "meteor" } }}
+            className={cn(
+              searchParams.get("series") === SatelliteSeries.METEOR && "bg-white/10",
+              "border-r border-white/5 font-light text-xs flex-1 p-3 text-center"
+            )}
           >
-            Latest Meteor
+            Meteor
           </Link>
-          <Link href={{ pathname: "/pi" }} className="font-light text-xs flex-1 p-3 text-center">
-            Latest pass
+          <Link
+            href={{ pathname: "/pi" }}
+            className={cn(!searchParams.get("series") && "bg-white/10", "font-light text-xs flex-1 p-3 text-center")}
+          >
+            Either
           </Link>
         </div>
       </div>
