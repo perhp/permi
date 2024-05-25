@@ -1,8 +1,10 @@
 "use client";
 
+import { Badge } from "@/components/ui/badge";
 import { Carousel, CarouselApi, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import { CDN_URL } from "@/lib/cdn-url";
 import { Pass } from "@/models/pass.model";
+import { getPassImageName } from "@/utils/get-pass-image-name";
 import { getSatelitteName } from "@/utils/get-satellite-name";
 import { format } from "date-fns";
 import Autoplay from "embla-carousel-autoplay";
@@ -51,8 +53,9 @@ export default function Pirousel({ latestPass }: Props) {
       >
         <CarouselContent>
           {latestPass.images.map((image) => (
-            <CarouselItem key={image.id} className="flex justify-center">
-              <img src={`${CDN_URL}/images/${image.path}`} alt={image.path} className="object-contain h-screen" />
+            <CarouselItem key={image.id} className="relative flex justify-center">
+              <img src={`${CDN_URL}/images/${image.path}`} alt={image.path} className="object-top max-h-screen" />
+              <Badge className="absolute top-5 left-5">{getPassImageName(image.path, latestPass)}</Badge>
             </CarouselItem>
           ))}
         </CarouselContent>
