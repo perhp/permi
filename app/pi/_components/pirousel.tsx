@@ -55,7 +55,9 @@ export default function Pirousel({ latestPass }: Props) {
           {latestPass.images.map((image) => (
             <CarouselItem key={image.id} className="relative flex justify-center">
               <img src={`${CDN_URL}/images/${image.path}`} alt={image.path} className="object-top max-h-screen" />
-              <Badge className="absolute top-5 left-5">{getPassImageName(image.path, latestPass)}</Badge>
+              <Badge className="absolute top-5 left-5 bg-white/5 border border-white/5 backdrop-blur">
+                {getPassImageName(image.path, latestPass)}
+              </Badge>
             </CarouselItem>
           ))}
         </CarouselContent>
