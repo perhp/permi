@@ -19,13 +19,13 @@ export default function PassesListItem({ pass }: Props) {
   return (
     <li key={pass.id}>
       <Link href={`/passes/${pass.id}`} className="flex flex-col">
-        <div className="flex h-52 md:h-72 lg:h-80">
+        <div className="flex h-52 md:h-72 lg:h-80 bg-black rounded-xl">
           <Image
             src={`${CDN_URL}/images/${imagesWithoutGraphs[0].path}`}
             alt={pass.images[0]!.path.split(".")[0].replace("-", " ")}
             width={300}
             height={300}
-            className="w-full h-full object-cover rounded-xl"
+            className="w-full h-full object-contain rounded-xl"
           />
         </div>
         <p className="text-2xl font-bold ml-2 text-black mt-2">{satelliteName}</p>
