@@ -81,6 +81,15 @@ export default function Pirousel({ latestPass }: Props) {
         </div>
         <div className="flex">
           <Link
+            href={{ pathname: "/pi" }}
+            className={cn(
+              !searchParams.get("series") && "bg-white/10",
+              "font-light text-xs flex-1 p-3 border-r border-white/5 text-center"
+            )}
+          >
+            Either
+          </Link>
+          <Link
             href={{ pathname: "/pi", query: { page: 1, series: SatelliteSeries.NOAA } }}
             className={cn(
               searchParams.get("series") === SatelliteSeries.NOAA && "bg-white/10",
@@ -93,16 +102,10 @@ export default function Pirousel({ latestPass }: Props) {
             href={{ pathname: "/pi", query: { page: 1, series: "meteor" } }}
             className={cn(
               searchParams.get("series") === SatelliteSeries.METEOR && "bg-white/10",
-              "border-r border-white/5 font-light text-xs flex-1 p-3 text-center"
+              "font-light text-xs flex-1 p-3 text-center"
             )}
           >
             Meteor
-          </Link>
-          <Link
-            href={{ pathname: "/pi" }}
-            className={cn(!searchParams.get("series") && "bg-white/10", "font-light text-xs flex-1 p-3 text-center")}
-          >
-            Either
           </Link>
         </div>
       </div>
