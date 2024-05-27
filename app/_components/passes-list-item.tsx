@@ -25,7 +25,7 @@ export default function PassesListItem({ pass }: Props) {
             alt={pass.images[0]!.path.split(".")[0].replace("-", " ")}
             width={300}
             height={300}
-            className="w-full h-full object-contain rounded-xl"
+            className="w-full h-full object-cover rounded-xl"
           />
         </div>
         <p className="text-2xl font-bold ml-2 text-black mt-2">{satelliteName}</p>
