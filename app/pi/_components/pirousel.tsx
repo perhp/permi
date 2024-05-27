@@ -1,7 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { Carousel, CarouselApi, CarouselContent, CarouselItem } from "@/components/ui/carousel";
+import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import { CDN_URL } from "@/lib/cdn-url";
 import { cn } from "@/lib/utils";
 import { Pass } from "@/models/pass.model";
@@ -9,10 +9,10 @@ import { getPassImageName } from "@/utils/get-pass-image-name";
 import { getSatelitteName } from "@/utils/get-satellite-name";
 import { format } from "date-fns";
 import Autoplay from "embla-carousel-autoplay";
-import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import { ChevronLeftIcon, ChevronRightIcon, RefreshCwIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { SatelliteSeries } from "../_enums/series";
 
 type Props = {
@@ -23,7 +23,6 @@ export const revalidate = 0;
 export default function Pirousel({ latestPass }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [carousel, setCarousel] = useState<CarouselApi>();
 
   useEffect(() => {
     const refresh = setInterval(() => {
@@ -38,10 +37,13 @@ export default function Pirousel({ latestPass }: Props) {
   const currentSeries = searchParams.get("series") as SatelliteSeries;
   const currentPage = Number(searchParams.get("page")) || 1;
 
+  const handleRefresh = () => {
+    window.location.reload();
+  };
+
   return (
     <>
       <Carousel
-        setApi={setCarousel}
         opts={{
           loop: true,
           duration: 100,
@@ -60,6 +62,9 @@ export default function Pirousel({ latestPass }: Props) {
           ))}
         </CarouselContent>
       </Carousel>
+      <button onClick={handleRefresh} className="fixed top-5 right-5 p-3 rounded-lg border border-white/5 bg-white/5 z-20 backdrop-blur">
+        <RefreshCwIcon className="w-4 h-4 text-white" />
+      </button>
       <div className="fixed z-20 bottom-5 inset-x-5 border text-white border-white/5 bg-white/5 rounded-lg backdrop-blur">
         <div className="border-b border-white/5 py-3 flex">
           <Link
