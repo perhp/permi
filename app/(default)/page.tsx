@@ -61,7 +61,7 @@ export default async function Page({ searchParams }: Props) {
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious
-              href={page - 1 === 1 ? "/passes" : `?page=${page - 1}`}
+              href={page - 1 === 1 ? "/" : `?page=${page - 1}`}
               className={cn(page - 1 < 1 && "pointer-events-none opacity-50")}
             />
           </PaginationItem>
