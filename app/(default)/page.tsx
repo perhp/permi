@@ -24,7 +24,7 @@ type Props = {
 export const revalidate = 0;
 export default async function Page({ searchParams }: Props) {
   const pageSize = 24;
-  const page = +(searchParams.page ?? 1);
+  const page = +(searchParams.page ?? 0);
 
   const [{ data: passes }, { count }] = await Promise.all([
     supabaseServiceClient
