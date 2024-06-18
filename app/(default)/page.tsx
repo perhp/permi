@@ -67,7 +67,7 @@ export default async function Page({ searchParams }: Props) {
           </PaginationItem>
           {before.map((p) => (
             <PaginationItem key={p}>
-              <PaginationLink href={p === 1 ? "/passes" : `?page=${p}`} className={cn(p === page && "bg-gray-100")}>
+              <PaginationLink href={p === 1 ? "/" : `?page=${p}`} className={cn(p === page && "bg-gray-100")}>
                 {p}
               </PaginationLink>
             </PaginationItem>
@@ -93,7 +93,7 @@ export default async function Page({ searchParams }: Props) {
           )}
           {after.map((p) => (
             <PaginationItem key={p}>
-              <PaginationLink href={p === 1 ? "/passes" : `?page=${p}`} className={cn(p === page && "bg-gray-100")}>
+              <PaginationLink href={p === 1 ? "/" : `?page=${p}`} className={cn(p === page && "bg-gray-100")}>
                 {p}
               </PaginationLink>
             </PaginationItem>
