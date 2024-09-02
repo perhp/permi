@@ -81,7 +81,7 @@ export default function Pass({ pass }: Props) {
             <button key={image.id} onClick={selectActiveImage(image)} className="relative flex h-96">
               <div className="absolute inset-0 bg-gray-100 -z-10 animate-pulse rounded-lg" />
               <img
-                src={`${CDN_URL}/images/${image?.path}`}
+                src={`${CDN_URL}/images/${image?.path}?width=400&height=400&resize=cover`}
                 alt={image.path.split(".")[0].replace("-", " ")}
                 className={cn("rounded-lg mb-3 w-full h-full object-cover", image.is_graph && "mix-blend-multiply")}
               />
