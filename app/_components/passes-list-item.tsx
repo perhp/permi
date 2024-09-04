@@ -22,7 +22,7 @@ export default function PassesListItem({ pass }: Props) {
         <div className="flex h-52 md:h-72 lg:h-80 bg-black rounded-xl relative">
           <div className="w-5 h-5 rounded-full border-t-2 border-l-2 border-t-white border-l-white border-r-2 border-b-2 border-r-white border-b-white/25 animate-spin absolute z-0 inset-0 m-auto" />
           <Image
-            src={`${CDN_URL}/images/${imagesWithoutGraphs[0].path}?width=400&height=400&resize=cover`}
+            src={`${CDN_URL}/images/${imagesWithoutGraphs[0].path}`}
             alt={pass.images[0]!.path.split(".")[0].replace("-", " ")}
             width={300}
             height={300}
