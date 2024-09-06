@@ -5,6 +5,9 @@ const nextConfig = {
       {
         hostname: "htyouocguzgigopxxidt.supabase.co",
       },
+      {
+        hostname: "permi.b-cdn.net",
+      },
     ],
   },
 };

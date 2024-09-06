@@ -1,1 +1,1 @@
-export const CDN_URL = "https://htyouocguzgigopxxidt.supabase.co/storage/v1/object/public/passes";
+export const CDN_URL = "https://permi.b-cdn.net/storage/v1/object/public/passes";
