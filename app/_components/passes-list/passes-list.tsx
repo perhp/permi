@@ -68,7 +68,7 @@ export default function PassesList({ passes }: Props) {
               alt={activePass.images[0].path.split(".")[0].replace("-", " ")}
               width={500}
               height={500}
-              className="fixed inset-0 m-auto rounded-lg max-h-[90%] select-none z-50 w-full max-w-screen-sm"
+              className="fixed inset-0 m-auto rounded-lg max-h-[90%] select-none z-50 max-w-screen-sm"
             />
             <motion.div
               initial={{ opacity: 0 }}
