@@ -11,7 +11,7 @@ import { supabaseServiceClient } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 import { passQuery } from "@/queries/pass.query";
 import { Metadata } from "next";
-import PassesListItem from "../_components/passes-list-item";
+import PassesList from "../_components/passes-list/passes-list";
 
 export const metadata: Metadata = {
   title: "All Passes | permi",
@@ -52,11 +52,7 @@ export default async function Page({ searchParams }: Props) {
           <span className="text-4xl font-bold text-black">All passes</span>
         </h1>
       </div>
-      <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mt-5">
-        {passes.map((pass) => (
-          <PassesListItem key={pass.id} pass={pass} />
-        ))}
-      </ul>
+      <PassesList passes={passes} />
       <Pagination className="mt-8">
         <PaginationContent>
           <PaginationItem>
