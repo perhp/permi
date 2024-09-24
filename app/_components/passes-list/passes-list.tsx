@@ -23,6 +23,31 @@ export default function PassesList({ passes }: Props) {
 
   return (
     <>
+      <AnimatePresence>
+        {activePass && (
+          <>
+            <motion.div
+              animate={{ scale: 1, opacity: 1 }}
+              initial={{ opacity: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              onClick={() => setActivePass(null!)}
+              className="fixed flex items-center justify-center w-full h-screen bg-white/20 z-20 top-0 left-0 p-5 backdrop-blur-sm"
+            >
+              <MotionImage
+                layoutId={activePass.id.toString()}
+                onClick={() => setActivePass(null!)}
+                src={`${CDN_URL}/images/${activePass.images[0].path}`}
+                alt={activePass.images[0].path.split(".")[0].replace("-", " ")}
+                width={500}
+                height={500}
+                className="rounded-lg mb-3 max-h-full select-none object-contain"
+              />
+            </motion.div>
+            <RemoveScrollBar />
+          </>
+        )}
+      </AnimatePresence>
       <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mt-5">
         {passes.map((pass) => {
           const satelliteName = getSatelitteName(pass);
@@ -58,29 +83,6 @@ export default function PassesList({ passes }: Props) {
           );
         })}
       </ul>
-      <AnimatePresence>
-        {activePass && (
-          <>
-            <MotionImage
-              layoutId={activePass.id.toString()}
-              onClick={() => setActivePass(null!)}
-              src={`${CDN_URL}/images/${activePass.images[0].path}`}
-              alt={activePass.images[0].path.split(".")[0].replace("-", " ")}
-              width={500}
-              height={500}
-              className="fixed inset-0 m-auto rounded-lg max-h-[90%] select-none z-50 max-w-screen-sm"
-            />
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setActivePass(null!)}
-              className="z-40 fixed inset-0 bg-white/20 backdrop-blur-sm"
-            />
-            <RemoveScrollBar />
-          </>
-        )}
-      </AnimatePresence>
     </>
   );
 }
