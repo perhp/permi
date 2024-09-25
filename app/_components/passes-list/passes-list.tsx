@@ -21,45 +21,25 @@ type Props = {
 export default function PassesList({ passes }: Props) {
   const [activePass, setActivePass] = useState<Pass>(null!);
 
+  const getImage = (images: Pass["images"]) => {
+    const candidate = images.filter((image) => image.path.indexOf("MCIR.jpg") > 0 || image.path.indexOf("221_corrected.jpg") > 0).at(0);
+    return candidate || images[0];
+  };
+
   return (
     <>
-      <AnimatePresence>
-        {activePass && (
-          <>
-            <motion.div
-              animate={{ scale: 1, opacity: 1 }}
-              initial={{ opacity: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.15 }}
-              onClick={() => setActivePass(null!)}
-              className="fixed flex items-center justify-center w-full h-screen bg-white/20 z-20 top-0 left-0 p-5 backdrop-blur-sm"
-            >
-              <MotionImage
-                layoutId={activePass.id.toString()}
-                onClick={() => setActivePass(null!)}
-                src={`${CDN_URL}/images/${activePass.images[0].path}`}
-                alt={activePass.images[0].path.split(".")[0].replace("-", " ")}
-                width={500}
-                height={500}
-                className="rounded-lg mb-3 max-h-full select-none object-contain"
-              />
-            </motion.div>
-            <RemoveScrollBar />
-          </>
-        )}
-      </AnimatePresence>
       <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mt-5">
         {passes.map((pass) => {
           const satelliteName = getSatelitteName(pass);
           const imagesWithoutGraphs = getImagesWithoutGraphs(pass.images);
 
           return (
-            <motion.li key={pass.id} layoutId={pass.id.toString()}>
-              <Link href={`/passes/${pass.id}`} className="flex flex-col">
-                <div className="group flex h-52 md:h-72 lg:h-80 bg-black rounded-xl relative">
+            <motion.li key={pass.id}>
+              <Link href={`/passes/${pass.id}`} className="flex flex-col group">
+                <div className="group flex h-52 md:h-72 lg:h-80 bg-black rounded-xl relative group-hover:shadow-lg transition-shadow">
                   <div className="w-5 h-5 rounded-full border-t-2 border-l-2 border-t-white border-l-white border-r-2 border-b-2 border-r-white border-b-white/25 animate-spin absolute z-0 inset-0 m-auto" />
                   <Image
-                    src={`${CDN_URL}/images/${imagesWithoutGraphs[0].path}`}
+                    src={`${CDN_URL}/images/${getImage(imagesWithoutGraphs)!.path}`}
                     alt={pass.images[0]!.path.split(".")[0].replace("-", " ")}
                     width={500}
                     height={500}
@@ -83,6 +63,32 @@ export default function PassesList({ passes }: Props) {
           );
         })}
       </ul>
+      <AnimatePresence>
+        {activePass && (
+          <>
+            <motion.div
+              animate={{ scale: 1, opacity: 1 }}
+              initial={{ opacity: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              onClick={() => setActivePass(null!)}
+              className="fixed flex items-center justify-center w-full h-screen bg-white/20 z-20 top-0 left-0 p-5 backdrop-blur-sm"
+            >
+              <motion.img
+                animate={{ scale: 1 }}
+                initial={{ scale: 0.9 }}
+                exit={{ scale: 0.9 }}
+                transition={{ duration: 0.1 }}
+                onClick={() => setActivePass(null!)}
+                src={`${CDN_URL}/images/${getImage(activePass.images)!.path}`}
+                alt={getImage(activePass.images)!.path.split(".")[0].replace("-", " ")}
+                className="rounded-lg mb-3 max-h-full select-none object-contain"
+              />
+            </motion.div>
+            <RemoveScrollBar />
+          </>
+        )}
+      </AnimatePresence>
     </>
   );
 }
