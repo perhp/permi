@@ -78,8 +78,11 @@ export default function Pass({ pass }: Props) {
         {[...imagesWithoutGraphs, ...imagesOfGraphs]
           .sort((a, b) => getPassImageName(a.path, pass).localeCompare(getPassImageName(b.path, pass)))
           .map((image) => (
-            <button key={image.id} onClick={selectActiveImage(image)} className="relative flex h-96">
-              <div className="absolute inset-0 bg-gray-100 -z-10 animate-pulse rounded-lg" />
+            <button
+              key={image.id}
+              onClick={selectActiveImage(image)}
+              className="relative flex h-96 bg-gray-100 rounded-lg hover:shadow-lg transition-shadow"
+            >
               <img
                 src={`${CDN_URL}/images/${image?.path}`}
                 alt={image.path.split(".")[0].replace("-", " ")}
