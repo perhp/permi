@@ -6,7 +6,7 @@ import { CDN_URL } from "@/lib/cdn-url";
 import { cn } from "@/lib/utils";
 import { Pass } from "@/models/pass.model";
 import { getPassImageName } from "@/utils/get-pass-image-name";
-import { getSatelitteName } from "@/utils/get-satellite-name";
+import { getSatelliteName } from "@/utils/get-satellite-name";
 import { format } from "date-fns";
 import Autoplay from "embla-carousel-autoplay";
 import { ChevronLeftIcon, ChevronRightIcon, RefreshCwIcon } from "lucide-react";
@@ -32,7 +32,7 @@ export default function Pirousel({ latestPass }: Props) {
     return () => clearInterval(refresh);
   }, []);
 
-  const satelliteName = getSatelitteName(latestPass);
+  const satelliteName = getSatelliteName(latestPass);
 
   const currentSeries = searchParams.get("series") as SatelliteSeries;
   const currentPage = Number(searchParams.get("page")) || 1;

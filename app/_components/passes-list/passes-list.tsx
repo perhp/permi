@@ -3,7 +3,7 @@
 import { CDN_URL } from "@/lib/cdn-url";
 import { Pass } from "@/models/pass.model";
 import { getImagesWithoutGraphs } from "@/utils/get-images-without-graphs";
-import { getSatelitteName } from "@/utils/get-satellite-name";
+import { getSatelliteName } from "@/utils/get-satellite-name";
 import { format } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
 import { Eye } from "lucide-react";
@@ -12,39 +12,42 @@ import Link from "next/link";
 import { useState } from "react";
 import { RemoveScrollBar } from "react-remove-scroll-bar";
 
-const MotionImage = motion(Image);
-
 type Props = {
   passes: Pass[];
 };
 
 export default function PassesList({ passes }: Props) {
-  const [activePass, setActivePass] = useState<Pass>(null!);
+  const [activePass, setActivePass] = useState<Pass | null>(null);
 
   const getImage = (images: Pass["images"]) => {
-    const candidate = images.filter((image) => image.path.indexOf("MCIR.jpg") > 0 || image.path.indexOf("221_corrected.jpg") > 0).at(0);
-    return candidate || images[0];
+    if (!images || images.length === 0) return null;
+    return images.find((image) => image.path.includes("MCIR.jpg") || image.path.includes("221_corrected.jpg")) || images[0];
   };
+
+  const activePassImage = activePass ? getImage(activePass.images) : null;
 
   return (
     <>
       <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mt-5">
         {passes.map((pass) => {
-          const satelliteName = getSatelitteName(pass);
+          const satelliteName = getSatelliteName(pass);
           const imagesWithoutGraphs = getImagesWithoutGraphs(pass.images);
+          const image = getImage(imagesWithoutGraphs);
 
           return (
             <motion.li key={pass.id}>
               <Link href={`/passes/${pass.id}`} className="flex flex-col group">
                 <div className="group flex h-52 md:h-72 lg:h-80 bg-black rounded-xl relative group-hover:shadow-lg transition-shadow">
                   <div className="w-5 h-5 rounded-full border-t-2 border-l-2 border-t-white border-l-white border-r-2 border-b-2 border-r-white border-b-white/25 animate-spin absolute z-0 inset-0 m-auto" />
-                  <Image
-                    src={`${CDN_URL}/images/${getImage(imagesWithoutGraphs)!.path}`}
-                    alt={pass.images[0]!.path.split(".")[0].replace("-", " ")}
-                    width={500}
-                    height={500}
-                    className="w-full h-full object-cover rounded-xl relative z-10"
-                  />
+                  {image && (
+                    <Image
+                      src={`${CDN_URL}/images/${image.path}`}
+                      alt={image.path.split(".")[0].replace("-", " ")}
+                      width={500}
+                      height={500}
+                      className="w-full h-full object-cover rounded-xl relative z-10"
+                    />
+                  )}
                   <button
                     onClick={(e) => {
                       e.preventDefault();
@@ -57,7 +60,7 @@ export default function PassesList({ passes }: Props) {
                   </button>
                 </div>
                 <p className="text-2xl font-bold ml-2 text-black mt-2">{satelliteName}</p>
-                <p className="text-sm -mt-1 ml-2">{format(pass.pass_start, "dd. MMM @ HH:mm")}</p>
+                <p className="text-sm -mt-1 ml-2">{format(new Date(pass.pass_start), "dd. MMM @ HH:mm")}</p>
               </Link>
             </motion.li>
           );
@@ -71,19 +74,22 @@ export default function PassesList({ passes }: Props) {
               initial={{ opacity: 0 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.15 }}
-              onClick={() => setActivePass(null!)}
+              onClick={() => setActivePass(null)}
               className="fixed flex items-center justify-center w-full h-screen bg-white/20 z-20 top-0 left-0 p-5 backdrop-blur-sm"
             >
-              <motion.img
-                animate={{ scale: 1 }}
-                initial={{ scale: 0.9 }}
-                exit={{ scale: 0.9 }}
-                transition={{ duration: 0.1 }}
-                onClick={() => setActivePass(null!)}
-                src={`${CDN_URL}/images/${getImage(activePass.images)!.path}`}
-                alt={getImage(activePass.images)!.path.split(".")[0].replace("-", " ")}
-                className="rounded-lg mb-3 max-h-full select-none object-contain"
-              />
+              {activePassImage ? (
+                <motion.img
+                  animate={{ scale: 1 }}
+                  initial={{ scale: 0.9 }}
+                  exit={{ scale: 0.9 }}
+                  transition={{ duration: 0.1 }}
+                  src={`${CDN_URL}/images/${activePassImage.path}`}
+                  alt={activePassImage.path.split(".")[0].replace("-", " ")}
+                  className="rounded-lg mb-3 max-h-full select-none object-contain"
+                />
+              ) : (
+                <p>No image available</p>
+              )}
             </motion.div>
             <RemoveScrollBar />
           </>

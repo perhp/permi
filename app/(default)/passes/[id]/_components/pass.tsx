@@ -7,7 +7,7 @@ import { Pass as PassModel } from "@/models/pass.model";
 import { getImagesOfGraphs } from "@/utils/get-images-of-graphs";
 import { getImagesWithoutGraphs } from "@/utils/get-images-without-graphs";
 import { getPassImageName } from "@/utils/get-pass-image-name";
-import { getSatelitteName } from "@/utils/get-satellite-name";
+import { getSatelliteName } from "@/utils/get-satellite-name";
 import { format } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
@@ -26,7 +26,7 @@ type Props = {
 export default function Pass({ pass }: Props) {
   const { images, gain, pass_start, direction, azimuth_at_max, max_elevation, pass_start_azimuth } = pass;
 
-  const satelliteName = getSatelitteName(pass);
+  const satelliteName = getSatelliteName(pass);
   const imagesWithoutGraphs: EnrichedPass["images"] = getImagesWithoutGraphs(images).map((image: any) => ({
     ...image,
     is_graph: false,
