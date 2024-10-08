@@ -21,7 +21,7 @@ type Props = {
   searchParams: { [key: string]: string[] | string | undefined };
 };
 
-export const revalidate = 0;
+export const revalidate = 5;
 export default async function Page({ searchParams }: Props) {
   const pageSize = 24;
   const page = +(searchParams.page ?? 1);
