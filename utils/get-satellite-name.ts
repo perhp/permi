@@ -1,6 +1,10 @@
 import { Pass } from "@/models/pass.model";
 
 export const getSatelliteName = ({ images, is_noaa, is_meteor }: Pass) => {
+  if (!images[0]) {
+    return "Unknown";
+  }
+
   if (is_noaa) {
     const [satelliteIdentifier, satelitteNumber] = images[0].path.split("-");
     return `${satelliteIdentifier} ${satelitteNumber}`;
