@@ -1,19 +1,27 @@
+import PassesList from "@/app/_components/passes-list/passes-list";
+import PassesListPagination from "@/app/_components/passes-list/passes-list-pagination";
 import { supabaseServiceClient } from "@/lib/supabase";
 import { passQuery } from "@/queries/pass.query";
 import { Metadata } from "next";
-import PassesList from "../_components/passes-list/passes-list";
-import PassesListPagination from "../_components/passes-list/passes-list-pagination";
 
 export const metadata: Metadata = {
   title: "All Passes | permi",
 };
 
-export const revalidate = 15;
-export default async function Page() {
+type Props = {
+  params: Record<string, string[] | string | undefined>;
+};
+
+export default async function Page({ params }: Props) {
   const pageSize = 24;
+  const page = +(params.page ?? 1);
 
   const [{ data: passes }, { count }] = await Promise.all([
-    supabaseServiceClient.from("passes").select(passQuery).order("pass_start", { ascending: false }).limit(pageSize),
+    supabaseServiceClient
+      .from("passes")
+      .select(passQuery)
+      .order("pass_start", { ascending: false })
+      .range(page * pageSize - pageSize, page * pageSize - 1),
     supabaseServiceClient.from("passes").select("count", { count: "exact" }),
   ]);
 
@@ -32,7 +40,7 @@ export default async function Page() {
         </h1>
       </div>
       <PassesList passes={passes} />
-      <PassesListPagination page={1} totalPages={totalPages} />
+      <PassesListPagination page={page} totalPages={totalPages} />
     </main>
   );
 }
