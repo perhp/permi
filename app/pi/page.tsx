@@ -8,7 +8,7 @@ type Props = {
 };
 
 export default async function Page({ searchParams }: Props) {
-  const passesBuilder = supabaseServiceClient.from("passes").select(passQuery).order("created_at", { ascending: false }).limit(1);
+  const passesBuilder = supabaseServiceClient.from("passes").select(passQuery).order("pass_start", { ascending: false }).limit(1);
 
   if (searchParams.series) {
     if (searchParams.series === SatelliteSeries.NOAA) {
