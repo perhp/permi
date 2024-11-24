@@ -31,7 +31,7 @@ export default async function Page() {
           <span className="text-4xl font-bold text-black">All passes</span>
         </h1>
       </div>
-      <PassesList passes={passes} />
+      <PassesList passes={passes} refreshOnLoad={true} />
       <PassesListPagination page={1} totalPages={totalPages} />
     </main>
   );
