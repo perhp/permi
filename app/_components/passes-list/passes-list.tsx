@@ -10,7 +10,7 @@ import { Eye } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { RemoveScrollBar } from "react-remove-scroll-bar";
 
 type Props = {
@@ -28,14 +28,6 @@ export default function PassesList({ passes, refreshOnLoad = false }: Props) {
   };
 
   const activePassImage = activePass ? getImage(activePass.images) : null;
-
-  useEffect(() => {
-    if (!refreshOnLoad) {
-      return;
-    }
-
-    router.refresh();
-  }, []);
 
   return (
     <>
