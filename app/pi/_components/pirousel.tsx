@@ -9,7 +9,7 @@ import { getPassImageName } from "@/utils/get-pass-image-name";
 import { getSatelliteName } from "@/utils/get-satellite-name";
 import { format } from "date-fns";
 import Autoplay from "embla-carousel-autoplay";
-import { ChevronLeftIcon, ChevronRightIcon, RefreshCwIcon } from "lucide-react";
+import { ChevronLeftIcon, ChevronRightIcon, ImageOff, RefreshCwIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
@@ -52,14 +52,23 @@ export default function Pirousel({ latestPass }: Props) {
         className="fixed inset-0 bg-black z-10"
       >
         <CarouselContent>
-          {latestPass.images.map((image) => (
-            <CarouselItem key={image.id} className="relative flex justify-center items-center">
-              <img src={`${CDN_URL}/images/${image.path}`} alt={image.path} className="object-contain h-screen" />
-              <Badge className="absolute top-5 left-5 bg-white/5 border border-white/5 backdrop-blur">
-                {getPassImageName(image.path, latestPass)}
-              </Badge>
+          {latestPass.images.length === 0 && (
+            <CarouselItem className="relative flex justify-center items-center h-screen">
+              <p className="text-white flex items-center gap-2">
+                No images available <ImageOff className="w-5 h-5" />{" "}
+              </p>
             </CarouselItem>
-          ))}
+          )}
+          {latestPass.images &&
+            latestPass.images.length > 0 &&
+            latestPass.images.map((image) => (
+              <CarouselItem key={image.id} className="relative flex justify-center items-center">
+                <img src={`${CDN_URL}/images/${image.path}`} alt={image.path} className="object-contain h-screen" />
+                <Badge className="absolute top-5 left-5 bg-white/5 border border-white/5 backdrop-blur">
+                  {getPassImageName(image.path, latestPass)}
+                </Badge>
+              </CarouselItem>
+            ))}
         </CarouselContent>
       </Carousel>
       <button onClick={handleRefresh} className="fixed top-5 right-5 p-3 rounded-lg border border-white/5 bg-white/5 z-20 backdrop-blur">
