@@ -22,8 +22,13 @@ export default async function Page({ searchParams }: Props) {
     passesBuilder.range(Number(searchParams.page) - 1, Number(searchParams.page));
   }
 
-  const { data } = await passesBuilder;
-  const [latestPass] = data ?? [];
+  const { data, error } = await passesBuilder;
 
+  if (error || !data || data.length === 0) {
+    console.error(error, data);
+    return <div>Error</div>;
+  }
+
+  const [latestPass] = data;
   return <Pirousel latestPass={latestPass} />;
 }
