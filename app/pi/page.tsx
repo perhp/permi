@@ -7,6 +7,7 @@ type Props = {
   searchParams: { [key: string]: string[] | string | undefined };
 };
 
+export const maxDuration = 60;
 export default async function Page({ searchParams }: Props) {
   const passesBuilder = supabaseServiceClient.from("passes").select(passQuery).order("pass_start", { ascending: false }).limit(1);
 
