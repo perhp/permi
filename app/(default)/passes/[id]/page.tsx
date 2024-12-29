@@ -9,11 +9,12 @@ export const metadata: Metadata = {
 };
 
 type Props = {
-  params: { [key: string]: string };
+  params: Promise<Record<string, string[] | string | undefined>>;
 };
 
 export const revalidate = 300;
-export default async function Page({ params }: Props) {
+export default async function Page(props: Props) {
+  const params = await props.params;
   const { id } = params;
   const { data: latestPass } = await supabaseServiceClient.from("passes").select(passQuery).eq("id", id).single();
   if (!latestPass) {

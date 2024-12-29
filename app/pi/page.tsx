@@ -4,11 +4,12 @@ import Pirousel from "./_components/pirousel";
 import { SatelliteSeries } from "./_enums/series";
 
 type Props = {
-  searchParams: { [key: string]: string[] | string | undefined };
+  searchParams: Promise<Record<string, string[] | string | undefined>>;
 };
 
 export const maxDuration = 60;
-export default async function Page({ searchParams }: Props) {
+export default async function Page(props: Props) {
+  const searchParams = await props.searchParams;
   const passesBuilder = supabaseServiceClient.from("passes").select(passQuery).order("pass_start", { ascending: false }).limit(1);
 
   if (searchParams.series) {

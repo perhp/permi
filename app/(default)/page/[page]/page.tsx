@@ -9,10 +9,11 @@ export const metadata: Metadata = {
 };
 
 type Props = {
-  params: Record<string, string[] | string | undefined>;
+  params: Promise<Record<string, string[] | string | undefined>>;
 };
 
-export default async function Page({ params }: Props) {
+export default async function Page(props: Props) {
+  const params = await props.params;
   const pageSize = 24;
   const page = +(params.page ?? 1);
 
