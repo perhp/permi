@@ -1,7 +1,7 @@
 import { Pass } from "@/models/pass.model";
 
 export const getSatelliteName = ({ images, is_noaa, is_meteor }: Pass) => {
-  if (!images[0]) {
+  if (!images || !images[0]) {
     return "Unknown";
   }
 
