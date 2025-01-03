@@ -7,7 +7,6 @@ import { getSatelliteName } from "@/utils/get-satellite-name";
 import { format } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
 import { Eye } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { RemoveScrollBar } from "react-remove-scroll-bar";
@@ -44,11 +43,9 @@ export default function PassesList({ passes }: Props) {
                 <div className="group flex h-52 md:h-72 lg:h-80 bg-black rounded-xl relative group-hover:shadow-lg transition-shadow">
                   <div className="w-5 h-5 rounded-full border-t-2 border-l-2 border-t-white border-l-white border-r-2 border-b-2 border-r-white border-b-white/25 animate-spin absolute z-0 inset-0 m-auto" />
                   {image && (
-                    <Image
-                      src={`${CDN_URL}/images/${image.path}`}
+                    <img
+                      src={`${CDN_URL}/images/${image.path}?width=500`}
                       alt={image.path.split(".")[0].replace("-", " ")}
-                      width={500}
-                      height={500}
                       className="w-full h-full object-cover rounded-xl relative z-10"
                     />
                   )}
