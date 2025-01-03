@@ -24,7 +24,11 @@ export default function PassesList({ passes, refreshOnLoad = false }: Props) {
 
   const getImage = (images: Pass["images"]) => {
     if (!images || images.length === 0) return null;
-    return images.find((image) => image.path.includes("MCIR.jpg") || image.path.includes("221_corrected.jpg")) || images[0];
+    return (
+      images.find(
+        (image) => image.path.endsWith("MCIR.jpg") || image.path.endsWith("221_corrected.jpg") || image.path.endsWith("spread_221.jpg")
+      ) || images[0]
+    );
   };
 
   const activePassImage = activePass ? getImage(activePass.images) : null;
