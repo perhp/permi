@@ -9,17 +9,14 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Eye } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { RemoveScrollBar } from "react-remove-scroll-bar";
 
 type Props = {
   passes: Pass[];
-  refreshOnLoad?: boolean;
 };
 
-export default function PassesList({ passes, refreshOnLoad = false }: Props) {
-  const router = useRouter();
+export default function PassesList({ passes }: Props) {
   const [activePass, setActivePass] = useState<Pass | null>(null);
 
   const getImage = (images: Pass["images"]) => {
