@@ -22,7 +22,11 @@ export default function PassesList({ passes }: Props) {
     if (!images || images.length === 0) return null;
     return (
       images.find(
-        (image) => image.path.endsWith("MCIR.jpg") || image.path.endsWith("221_corrected.jpg") || image.path.endsWith("spread_221.jpg")
+        (image) =>
+          image.path.endsWith("221_composite.jpg") ||
+          image.path.endsWith("MCIR.jpg") ||
+          image.path.endsWith("221_corrected.jpg") ||
+          image.path.endsWith("spread_221.jpg")
       ) || images[0]
     );
   };
