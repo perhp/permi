@@ -9,60 +9,79 @@ import {
 } from "@/components/ui/pagination";
 import { cn } from "@/lib/utils";
 
-type Props = {
+interface Props {
   page: number;
   totalPages: number;
-};
+  siblingCount?: number;
+}
 
-export default function PassesListPagination({ page, totalPages }: Props) {
-  const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
-  const before = pages.slice(0, 2);
-  const after = pages.slice(totalPages - 2, totalPages);
+const range = (start: number, end: number) => Array.from({ length: end - start + 1 }, (_, i) => start + i);
+
+export default function PassesListPagination({ page, totalPages, siblingCount = 1 }: Props) {
+  type PageToken = number | "DOTS";
+  const tokens: PageToken[] = [];
+
+  const totalNumbers = siblingCount * 2 + 5;
+
+  if (totalPages <= totalNumbers) {
+    tokens.push(...range(1, totalPages));
+  } else {
+    const leftSibling = Math.max(page - siblingCount, 2);
+    const rightSibling = Math.min(page + siblingCount, totalPages - 1);
+    const showLeftDots = leftSibling > 2;
+    const showRightDots = rightSibling < totalPages - 1;
+
+    tokens.push(1);
+    if (showLeftDots) tokens.push("DOTS");
+
+    tokens.push(...range(leftSibling, rightSibling));
+
+    if (showRightDots) tokens.push("DOTS");
+    tokens.push(totalPages);
+  }
+
+  const hrefFor = (p: number) => (p === 1 ? "/" : `/page/${p}`);
+  const isFirst = page === 1;
+  const isLast = page === totalPages;
 
   return (
     <Pagination className="mt-8">
       <PaginationContent>
         <PaginationItem>
           <PaginationPrevious
-            href={page - 1 === 1 ? "/" : `/page/${page - 1}`}
-            className={cn(page - 1 < 1 && "pointer-events-none opacity-50")}
+            aria-label="Go to previous page"
+            href={hrefFor(Math.max(page - 1, 1))}
+            className={cn("rounded-md focus-visible:ring-2 focus-visible:ring-ring", isFirst && "pointer-events-none opacity-50")}
           />
         </PaginationItem>
-        {before.map((p) => (
-          <PaginationItem key={p}>
-            <PaginationLink href={p === 1 ? "/" : `/page/${p}`} className={cn(p === page && "bg-gray-100")}>
-              {p}
-            </PaginationLink>
-          </PaginationItem>
-        ))}
-        {page > 3 && (
-          <PaginationItem>
-            <PaginationEllipsis />
-          </PaginationItem>
-        )}
-        {page > 2 && page < totalPages - 1 && (
-          <>
-            <PaginationItem key={page}>
-              <PaginationLink href={`/page/${page}`} className="bg-gray-100">
-                {page}
+
+        {tokens.map((token, idx) =>
+          token === "DOTS" ? (
+            <PaginationItem key={`dots-${idx}`}>
+              <PaginationEllipsis />
+            </PaginationItem>
+          ) : (
+            <PaginationItem key={token}>
+              <PaginationLink
+                href={hrefFor(token)}
+                aria-current={token === page ? "page" : undefined}
+                className={cn(
+                  "rounded-md focus-visible:ring-2 focus-visible:ring-ring",
+                  token === page && "bg-muted text-primary font-medium"
+                )}
+              >
+                {token}
               </PaginationLink>
             </PaginationItem>
-          </>
+          )
         )}
-        {page < totalPages - 2 && (
-          <PaginationItem>
-            <PaginationEllipsis />
-          </PaginationItem>
-        )}
-        {after.map((p) => (
-          <PaginationItem key={p}>
-            <PaginationLink href={p === 1 ? "/" : `/page/${p}`} className={cn(p === page && "bg-gray-100")}>
-              {p}
-            </PaginationLink>
-          </PaginationItem>
-        ))}
+
         <PaginationItem>
-          <PaginationNext href={`/page/${page + 1}`} className={cn(page + 1 > totalPages && "pointer-events-none opacity-50")} />
+          <PaginationNext
+            aria-label="Go to next page"
+            href={hrefFor(Math.min(page + 1, totalPages))}
+            className={cn("rounded-md focus-visible:ring-2 focus-visible:ring-ring", isLast && "pointer-events-none opacity-50")}
+          />
         </PaginationItem>
       </PaginationContent>
     </Pagination>
