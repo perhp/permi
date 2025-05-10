@@ -15,7 +15,9 @@ interface Props {
   siblingCount?: number;
 }
 
-const range = (start: number, end: number) => Array.from({ length: end - start + 1 }, (_, i) => start + i);
+const range = (start: number, end: number) => {
+  return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+};
 
 export default function PassesListPagination({ page, totalPages, siblingCount = 1 }: Props) {
   type PageToken = number | "DOTS";
@@ -32,11 +34,15 @@ export default function PassesListPagination({ page, totalPages, siblingCount = 
     const showRightDots = rightSibling < totalPages - 1;
 
     tokens.push(1);
-    if (showLeftDots) tokens.push("DOTS");
+    if (showLeftDots) {
+      tokens.push("DOTS");
+    }
 
     tokens.push(...range(leftSibling, rightSibling));
 
-    if (showRightDots) tokens.push("DOTS");
+    if (showRightDots) {
+      tokens.push("DOTS");
+    }
     tokens.push(totalPages);
   }
 
