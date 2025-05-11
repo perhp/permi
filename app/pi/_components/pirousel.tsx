@@ -8,7 +8,6 @@ import { Pass } from "@/models/pass.model";
 import { getPassImageName } from "@/utils/get-pass-image-name";
 import { getSatelliteName } from "@/utils/get-satellite-name";
 import { format } from "date-fns";
-import Autoplay from "embla-carousel-autoplay";
 import { ChevronLeftIcon, ChevronRightIcon, ImageOff, RefreshCwIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -48,7 +47,6 @@ export default function Pirousel({ latestPass }: Props) {
           loop: true,
           duration: 100,
         }}
-        plugins={[Autoplay({ delay: 30000 })]}
         className="fixed inset-0 bg-black z-10"
       >
         <CarouselContent>
