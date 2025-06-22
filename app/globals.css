@@ -37,10 +37,6 @@
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
-
   body {
     @apply flex flex-col bg-white text-foreground min-h-screen overflow-y-scroll;
   }
