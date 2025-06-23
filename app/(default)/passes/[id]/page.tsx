@@ -12,7 +12,7 @@ type Props = {
   params: Promise<Record<string, string[] | string | undefined>>;
 };
 
-export const revalidate = 300;
+export const dynamic = "force-static";
 export default async function Page(props: Props) {
   const params = await props.params;
   const { id } = params;
