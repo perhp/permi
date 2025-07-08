@@ -31,7 +31,7 @@ export default function PassesList({ passes }: Props) {
     );
   };
 
-  const activePassImage = activePass ? getImage(activePass.images) : null;
+  const activePassImage = activePass ? getImage(getImagesWithoutGraphs(activePass.images)) : null;
 
   return (
     <>
