@@ -82,6 +82,9 @@ export default function PassesList({ passes }: Props) {
               onClick={() => setActivePass(null)}
               className="fixed flex items-center justify-center w-full h-screen bg-white/20 z-20 top-0 left-0 p-5 backdrop-blur-sm"
             >
+              <div className="absolute z-0 inset-0 m-auto bg-black/50 size-12 p-1 rounded-full">
+                <div className="size-10 rounded-full border-8 border-white border-b-white/25 animate-spin" />
+              </div>
               {activePassImage ? (
                 <motion.img
                   animate={{ scale: 1 }}
@@ -90,7 +93,7 @@ export default function PassesList({ passes }: Props) {
                   transition={{ duration: 0.1 }}
                   src={`${CDN_URL}/images/${activePassImage.path}`}
                   alt={activePassImage.path.split(".")[0].replace("-", " ")}
-                  className="rounded-lg mb-3 max-h-full select-none object-contain"
+                  className="rounded-lg mb-3 max-h-full select-none object-contain z-20"
                 />
               ) : (
                 <p>No image available</p>
