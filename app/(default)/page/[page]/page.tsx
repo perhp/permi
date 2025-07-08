@@ -1,6 +1,6 @@
 import PassesList from "@/app/_components/passes-list/passes-list";
 import PassesListPagination from "@/app/_components/passes-list/passes-list-pagination";
-import { supabaseServiceClient } from "@/lib/supabase";
+import { createServiceClient } from "@/lib/supabase";
 import { passQuery } from "@/queries/pass.query";
 import { Metadata } from "next";
 
@@ -17,6 +17,7 @@ export default async function Page(props: Props) {
   const pageSize = 24;
   const page = +(params.page ?? 1);
 
+  const supabaseServiceClient = await createServiceClient();
   const [{ data: passes }, { count }] = await Promise.all([
     supabaseServiceClient
       .from("passes")

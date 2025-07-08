@@ -1,4 +1,4 @@
-import { supabaseServiceClient } from "@/lib/supabase";
+import { createServiceClient } from "@/lib/supabase";
 import { passQuery } from "@/queries/pass.query";
 import { Metadata } from "next";
 import PassesList from "../_components/passes-list/passes-list";
@@ -12,7 +12,8 @@ export const revalidate = 15;
 export default async function Page() {
   const pageSize = 24;
 
-  const [{ data: passes }, { count }] = await Promise.all([
+  const supabaseServiceClient = await createServiceClient();
+  const [{ data: passes, error }, { count }] = await Promise.all([
     supabaseServiceClient.from("passes").select(passQuery).order("pass_start", { ascending: false }).limit(pageSize),
     supabaseServiceClient.from("passes").select("count", { count: "exact" }),
   ]);

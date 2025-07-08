@@ -1,4 +1,4 @@
-import { supabaseServiceClient } from "@/lib/supabase";
+import { createServiceClient } from "@/lib/supabase";
 import { passQuery } from "@/queries/pass.query";
 import Pirousel from "./_components/pirousel";
 import { SatelliteSeries } from "./_enums/series";
@@ -10,6 +10,8 @@ type Props = {
 export const maxDuration = 60;
 export default async function Page(props: Props) {
   const searchParams = await props.searchParams;
+
+  const supabaseServiceClient = await createServiceClient();
   const passesBuilder = supabaseServiceClient.from("passes").select(passQuery).order("pass_start", { ascending: false }).limit(1);
 
   if (searchParams.series) {
