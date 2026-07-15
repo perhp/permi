@@ -73,20 +73,24 @@ function SectionHeading({
   title: string;
 }) {
   return (
-    <div className="grid gap-5 lg:grid-cols-[0.62fr_1.38fr] lg:items-end">
-      <p className="flex items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[#256a8a]">
-        <Icon className="size-3.5" />
-        {label}
-      </p>
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <h2 className="text-4xl font-semibold tracking-[-0.055em] text-[#10212b] sm:text-5xl">
+    <header className="border-b border-[#cbdada] pb-7 sm:pb-8">
+      <div className="flex items-center gap-3 text-[#256a8a]">
+        <span className="flex size-8 items-center justify-center rounded-full bg-[#e7efef]">
+          <Icon className="size-3.5" />
+        </span>
+        <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em]">
+          {label}
+        </p>
+      </div>
+      <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_28rem] lg:items-end lg:gap-12">
+        <h2 className="max-w-3xl text-4xl font-semibold tracking-[-0.055em] text-[#10212b] sm:text-5xl">
           {title}
         </h2>
-        <p className="max-w-md text-sm leading-6 text-[#5c6f76] sm:text-right">
+        <p className="max-w-xl text-sm leading-6 text-[#5c6f76] lg:pb-0.5">
           {description}
         </p>
       </div>
-    </div>
+    </header>
   );
 }
 
@@ -144,10 +148,10 @@ export default async function Page() {
         <section id="schedule" className="scroll-mt-20 py-20 sm:py-28">
           <div className="container">
             <SectionHeading
-              description="The receiver wakes automatically for each window. Higher elevations usually mean a cleaner signal."
+              description="The receiver starts automatically for each window. Higher passes usually produce a clearer signal."
               icon={RadioTower}
-              label="Flight plan"
-              title="Next over the horizon"
+              label="Schedule"
+              title="Upcoming passes"
             />
             {upcomingPasses.length > 0 ? (
               <UpcomingPassesList passes={upcomingPasses} />
@@ -168,8 +172,8 @@ export default async function Page() {
             <SectionHeading
               description={`${passes.length} received passes, newest first. Open a capture to explore every processed channel and signal graph.`}
               icon={ScanLine}
-              label="Downlink archive"
-              title="Earlier weather from orbit"
+              label="Archive"
+              title="Recent captures"
             />
             {passes.length > 1 ? (
               <PassesList passes={passes.slice(1)} />
@@ -185,10 +189,10 @@ export default async function Page() {
         <section id="station" className="scroll-mt-20 py-20 sm:py-28">
           <div className="container">
             <SectionHeading
-              description="A concise readiness check for the Raspberry Pi. Historical charts stay close when diagnostics are needed."
+              description="Current Raspberry Pi readings, with historical telemetry available when you need it."
               icon={Activity}
-              label="Receiver health"
-              title="Station telemetry"
+              label="Receiver"
+              title="Station health"
             />
             {stats.length > 0 ? (
               <StatsDashboard referenceTime={now.getTime()} stats={stats} />
