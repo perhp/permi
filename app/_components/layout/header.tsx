@@ -16,6 +16,9 @@ export default function Header() {
             <NavLink href="/" className="font-medium text-sm">
               Passes
             </NavLink>
+            <NavLink href="/upcoming" className="font-medium text-sm">
+              Upcoming
+            </NavLink>
             <NavLink href="/setup" className="font-medium text-sm">
               Setup
             </NavLink>
