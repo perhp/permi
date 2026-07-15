@@ -34,3 +34,12 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+## Expired pass cleanup
+
+Vercel invokes `/api/cron/cleanup-passes` every day at 04:00 UTC. The job deletes
+images from the `passes` Supabase Storage bucket before deleting passes whose
+`pass_start` is more than one month old.
+
+Set `CRON_SECRET` in the Vercel project environment. Vercel sends this value as a
+Bearer token when it invokes the endpoint, and all other requests are rejected.
