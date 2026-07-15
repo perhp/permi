@@ -68,10 +68,6 @@ const diskConfig = {
   diskTotal: { label: "Total", color: "#a5f3fc" },
 } satisfies ChartConfig;
 
-const uptimeConfig = {
-  uptime: { label: "Uptime", color: "#16a34a" },
-} satisfies ChartConfig;
-
 function bytesToGiB(value: number | null) {
   return value === null ? null : Number((value / 1024 ** 3).toFixed(2));
 }
@@ -182,6 +178,146 @@ function MetricChart({
             No samples in this time range.
           </div>
         )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function UptimeTimeline({
+  data,
+  range,
+  referenceTime,
+}: {
+  data: ChartPoint[];
+  range: RangeKey;
+  referenceTime: number;
+}) {
+  const validData = data.filter(
+    (point): point is ChartPoint & { uptime: number } => point.uptime !== null,
+  );
+
+  if (validData.length === 0) {
+    return (
+      <Card className="rounded-2xl border-[#d9e4e3] shadow-none lg:col-span-2">
+        <CardHeader>
+          <CardTitle>Uptime</CardTitle>
+          <CardDescription>
+            No uptime readings in this time range.
+          </CardDescription>
+        </CardHeader>
+      </Card>
+    );
+  }
+
+  const selectedRange = RANGES.find((item) => item.value === range)!;
+  const windowStart = referenceTime - selectedRange.milliseconds;
+  const latest = validData.at(-1)!;
+  const inferredBootTime = latest.timestamp - latest.uptime * 3_600_000;
+  const restartEvents = validData.slice(1).flatMap((point, index) => {
+    const previous = validData[index];
+
+    if (point.uptime < previous.uptime - 0.1) {
+      return [point.timestamp - point.uptime * 3_600_000];
+    }
+
+    return [];
+  });
+
+  const positionFor = (timestamp: number) =>
+    Math.min(
+      100,
+      Math.max(
+        0,
+        ((timestamp - windowStart) / selectedRange.milliseconds) * 100,
+      ),
+    );
+  const observedStart = positionFor(validData[0].timestamp);
+  const observedEnd = positionFor(latest.timestamp);
+
+  return (
+    <Card className="rounded-2xl border-[#d9e4e3] shadow-none lg:col-span-2">
+      <CardHeader className="gap-1">
+        <CardTitle>Uptime continuity</CardTitle>
+        <CardDescription>
+          Restarts detected when the station&apos;s reported uptime resets.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <dl className="grid overflow-hidden rounded-xl border border-[#d9e4e3] sm:grid-cols-3">
+          <div className="p-4 sm:p-5">
+            <dt className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[#5c6f76]">
+              Current run
+            </dt>
+            <dd className="mt-1.5 text-xl font-semibold tracking-[-0.03em]">
+              {formatUptime(latest.uptime * 3_600_000)}
+            </dd>
+          </div>
+          <div className="border-t border-[#d9e4e3] p-4 sm:border-l sm:border-t-0 sm:p-5">
+            <dt className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[#5c6f76]">
+              Current run started
+            </dt>
+            <dd className="mt-1.5 text-xl font-semibold tracking-[-0.03em]">
+              {format(new Date(inferredBootTime), "dd MMM · HH:mm")}
+            </dd>
+          </div>
+          <div className="border-t border-[#d9e4e3] p-4 sm:border-l sm:border-t-0 sm:p-5">
+            <dt className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[#5c6f76]">
+              Restarts in window
+            </dt>
+            <dd className="mt-1.5 text-xl font-semibold tracking-[-0.03em]">
+              {restartEvents.length}
+            </dd>
+          </div>
+        </dl>
+
+        <div className="mt-8">
+          <div className="mb-3 flex items-center justify-between gap-4 text-xs text-[#5c6f76]">
+            <span>
+              {format(
+                new Date(windowStart),
+                range === "7d" ? "dd MMM" : "HH:mm",
+              )}
+            </span>
+            <span className="flex items-center gap-2 font-medium text-[#2e7d5b]">
+              <span className="size-1.5 rounded-full bg-[#2e7d5b]" />
+              {restartEvents.length === 0
+                ? "No restarts detected"
+                : `${restartEvents.length} ${restartEvents.length === 1 ? "restart" : "restarts"} detected`}
+            </span>
+            <span>Now</span>
+          </div>
+
+          <div className="relative h-8" aria-label="Uptime restart timeline">
+            <div className="absolute inset-x-0 top-3 h-1 rounded-full bg-[#e7efef]" />
+            <div
+              className="absolute top-3 h-1 rounded-full bg-[#2e7d5b]"
+              style={{
+                left: `${observedStart}%`,
+                width: `${Math.max(1, observedEnd - observedStart)}%`,
+              }}
+            />
+            {restartEvents.map((timestamp) => (
+              <span
+                key={timestamp}
+                title={`Restart around ${format(new Date(timestamp), "dd MMM yyyy · HH:mm")}`}
+                className="absolute top-0 h-7 w-0.5 -translate-x-1/2 rounded-full bg-[#e8a735]"
+                style={{ left: `${positionFor(timestamp)}%` }}
+              >
+                <span className="absolute -left-1 top-2 size-2.5 rounded-full border-2 border-white bg-[#e8a735]" />
+              </span>
+            ))}
+          </div>
+
+          <div className="mt-1 flex items-center gap-5 font-mono text-[10px] uppercase tracking-[0.12em] text-[#5c6f76]">
+            <span className="flex items-center gap-1.5">
+              <span className="h-1 w-4 rounded-full bg-[#2e7d5b]" /> Reported
+              uptime
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="h-3 w-0.5 bg-[#e8a735]" /> Restart
+            </span>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );
@@ -332,17 +468,11 @@ export default function StatsDashboard({ referenceTime, stats }: Props) {
               title="Disk"
               unit=" GiB"
             />
-            <div className="lg:col-span-2">
-              <MetricChart
-                config={uptimeConfig}
-                data={data}
-                description="Hours since the Raspberry Pi last restarted."
-                range={range}
-                series={[{ dataKey: "uptime", stroke: "var(--color-uptime)" }]}
-                title="Uptime"
-                unit="h"
-              />
-            </div>
+            <UptimeTimeline
+              data={data}
+              range={range}
+              referenceTime={referenceTime}
+            />
           </div>
         </div>
       </details>
