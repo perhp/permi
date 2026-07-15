@@ -5,7 +5,7 @@ import { Pass } from "@/models/pass.model";
 import { getImagesWithoutGraphs } from "@/utils/get-images-without-graphs";
 import { getSatelliteName } from "@/utils/get-satellite-name";
 import { format } from "date-fns";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "motion/react";
 import { Eye } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -26,12 +26,14 @@ export default function PassesList({ passes }: Props) {
           image.path.endsWith("221_composite.jpg") ||
           image.path.endsWith("MCIR.jpg") ||
           image.path.endsWith("221_corrected.jpg") ||
-          image.path.endsWith("spread_221.jpg")
+          image.path.endsWith("spread_221.jpg"),
       ) || images[0]
     );
   };
 
-  const activePassImage = activePass ? getImage(getImagesWithoutGraphs(activePass.images)) : null;
+  const activePassImage = activePass
+    ? getImage(getImagesWithoutGraphs(activePass.images))
+    : null;
 
   return (
     <>
@@ -64,8 +66,12 @@ export default function PassesList({ passes }: Props) {
                     <Eye className="w-4 h-4" />
                   </button>
                 </div>
-                <p className="text-2xl font-bold ml-2 text-black mt-2">{satelliteName}</p>
-                <p className="text-sm -mt-1 ml-2">{format(new Date(pass.pass_start), "dd. MMM @ HH:mm")}</p>
+                <p className="text-2xl font-bold ml-2 text-black mt-2">
+                  {satelliteName}
+                </p>
+                <p className="text-sm -mt-1 ml-2">
+                  {format(new Date(pass.pass_start), "dd. MMM @ HH:mm")}
+                </p>
               </Link>
             </motion.li>
           );

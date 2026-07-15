@@ -9,7 +9,7 @@ import { getImagesWithoutGraphs } from "@/utils/get-images-without-graphs";
 import { getPassImageName } from "@/utils/get-pass-image-name";
 import { getSatelliteName } from "@/utils/get-satellite-name";
 import { format } from "date-fns";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { RemoveScrollBar } from "react-remove-scroll-bar";
 
@@ -24,16 +24,30 @@ type Props = {
 };
 
 export default function Pass({ pass }: Props) {
-  const { images, gain, pass_start, direction, azimuth_at_max, max_elevation, pass_start_azimuth } = pass;
+  const {
+    images,
+    gain,
+    pass_start,
+    direction,
+    azimuth_at_max,
+    max_elevation,
+    pass_start_azimuth,
+  } = pass;
 
   const satelliteName = getSatelliteName(pass);
-  const imagesWithoutGraphs: EnrichedPass["images"] = getImagesWithoutGraphs(images).map((image: any) => ({
+  const imagesWithoutGraphs: EnrichedPass["images"] = getImagesWithoutGraphs(
+    images,
+  ).map((image) => ({
     ...image,
     is_graph: false,
   }));
-  const imagesOfGraphs: EnrichedPass["images"] = getImagesOfGraphs(images).map((image: any) => ({ ...image, is_graph: true }));
+  const imagesOfGraphs: EnrichedPass["images"] = getImagesOfGraphs(images).map(
+    (image) => ({ ...image, is_graph: true }),
+  );
 
-  const [activeImage, setActiveImage] = useState<EnrichedPass["images"][number] | null>(null);
+  const [activeImage, setActiveImage] = useState<
+    EnrichedPass["images"][number] | null
+  >(null);
 
   const selectActiveImage = (image: EnrichedPass["images"][number]) => () => {
     setActiveImage(image);
@@ -50,33 +64,52 @@ export default function Pass({ pass }: Props) {
           {format(pass_start, "dd. MMM @ HH:mm")} <br />
           <span className="text-4xl font-bold text-black">{satelliteName}</span>
         </h1>
-        <Badge variant="outline" className="mt-auto mb-[6px] w-min whitespace-nowrap bg-white">
+        <Badge
+          variant="outline"
+          className="mt-auto mb-[6px] w-min whitespace-nowrap bg-white"
+        >
           {gain} gain
         </Badge>
         {direction && (
-          <Badge variant="outline" className="mt-auto mb-[6px] w-min whitespace-nowrap bg-white">
+          <Badge
+            variant="outline"
+            className="mt-auto mb-[6px] w-min whitespace-nowrap bg-white"
+          >
             {direction}
           </Badge>
         )}
         {pass_start_azimuth && (
-          <Badge variant="outline" className="mt-auto mb-[6px] w-min whitespace-nowrap bg-white">
+          <Badge
+            variant="outline"
+            className="mt-auto mb-[6px] w-min whitespace-nowrap bg-white"
+          >
             {pass_start_azimuth}° azimuth at start
           </Badge>
         )}
         {azimuth_at_max && (
-          <Badge variant="outline" className="mt-auto mb-[6px] w-min whitespace-nowrap bg-white">
+          <Badge
+            variant="outline"
+            className="mt-auto mb-[6px] w-min whitespace-nowrap bg-white"
+          >
             {azimuth_at_max}° azimuth at max
           </Badge>
         )}
         {max_elevation && (
-          <Badge variant="outline" className="mt-auto mb-[6px] w-min whitespace-nowrap bg-white">
+          <Badge
+            variant="outline"
+            className="mt-auto mb-[6px] w-min whitespace-nowrap bg-white"
+          >
             {max_elevation}° max elevation
           </Badge>
         )}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mt-5">
         {[...imagesWithoutGraphs, ...imagesOfGraphs]
-          .sort((a, b) => getPassImageName(a.path, pass).localeCompare(getPassImageName(b.path, pass)))
+          .sort((a, b) =>
+            getPassImageName(a.path, pass).localeCompare(
+              getPassImageName(b.path, pass),
+            ),
+          )
           .map((image) => (
             <button
               key={image.id}
@@ -86,9 +119,16 @@ export default function Pass({ pass }: Props) {
               <img
                 src={`${CDN_URL}/images/${image?.path}`}
                 alt={image.path.split(".")[0].replace("-", " ")}
-                className={cn("rounded-lg mb-3 w-full h-full object-cover", image.is_graph && "mix-blend-multiply")}
+                className={cn(
+                  "rounded-lg mb-3 w-full h-full object-cover",
+                  image.is_graph && "mix-blend-multiply",
+                )}
               />
-              {!image.is_graph && <Badge className="absolute z-10 top-3 left-3 capitalize">{getPassImageName(image.path, pass)}</Badge>}
+              {!image.is_graph && (
+                <Badge className="absolute z-10 top-3 left-3 capitalize">
+                  {getPassImageName(image.path, pass)}
+                </Badge>
+              )}
             </button>
           ))}
       </div>
