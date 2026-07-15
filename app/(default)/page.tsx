@@ -67,11 +67,11 @@ function SectionHeading({
           {label}
         </p>
       </div>
-      <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_28rem] lg:items-end lg:gap-12">
+      <div className="mt-5">
         <h2 className="max-w-3xl text-4xl font-semibold tracking-[-0.055em] text-[#10212b] sm:text-5xl">
           {title}
         </h2>
-        <p className="max-w-xl text-sm leading-6 text-[#5c6f76] lg:pb-0.5">
+        <p className="mt-3 max-w-2xl text-sm leading-6 text-[#5c6f76]">
           {description}
         </p>
       </div>
