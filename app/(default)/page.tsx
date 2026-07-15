@@ -1,7 +1,6 @@
 import { createServiceClient } from "@/lib/supabase";
 import { RaspberryStat } from "@/models/raspberry-stat.model";
 import { passQuery } from "@/queries/pass.query";
-import { getImagesWithoutGraphs } from "@/utils/get-images-without-graphs";
 import { subDays } from "date-fns";
 import { Activity, RadioTower, ScanLine } from "lucide-react";
 import { Metadata } from "next";
@@ -45,20 +44,6 @@ async function loadStats(cutoff: string) {
   }
 
   return stats;
-}
-
-function getPrimaryImage(images: { id: number; path: string }[]) {
-  if (images.length === 0) return null;
-
-  return (
-    images.find(
-      (image) =>
-        image.path.endsWith("221_composite.jpg") ||
-        image.path.endsWith("MCIR.jpg") ||
-        image.path.endsWith("221_corrected.jpg") ||
-        image.path.endsWith("spread_221.jpg"),
-    ) ?? images[0]
-  );
 }
 
 function SectionHeading({
@@ -129,15 +114,9 @@ export default async function Page() {
     throw new Error("No passes found");
   }
 
-  const latestPass = passes[0];
-  const latestImages = getImagesWithoutGraphs(latestPass.images);
-  const featuredImage = getPrimaryImage(latestImages);
-
   return (
     <>
       <LandingHero
-        featuredImagePath={featuredImage?.path ?? null}
-        latestPass={latestPass}
         latestStat={stats.at(-1) ?? null}
         nextPass={upcomingPasses[0] ?? null}
         now={now}
@@ -175,14 +154,7 @@ export default async function Page() {
               label="Archive"
               title="Recent captures"
             />
-            {passes.length > 1 ? (
-              <PassesList passes={passes.slice(1)} />
-            ) : (
-              <p className="mt-10 text-sm text-[#5c6f76]">
-                The latest downlink is featured above. Earlier captures will
-                appear here.
-              </p>
-            )}
+            <PassesList passes={passes} />
           </div>
         </section>
 
