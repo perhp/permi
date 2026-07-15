@@ -19,6 +19,9 @@ export default function Header() {
             <NavLink href="/upcoming" className="font-medium text-sm">
               Upcoming
             </NavLink>
+            <NavLink href="/stats" className="font-medium text-sm">
+              Stats
+            </NavLink>
             <NavLink href="/setup" className="font-medium text-sm">
               Setup
             </NavLink>
