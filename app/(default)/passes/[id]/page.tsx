@@ -24,7 +24,7 @@ export default async function Page(props: Props) {
   }
 
   return (
-    <main className="container py-16">
+    <main className="container pb-8 pt-7">
       <Pass pass={latestPass} />
     </main>
   );

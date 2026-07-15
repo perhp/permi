@@ -1,24 +1,52 @@
-import { LockClosedIcon } from "@radix-ui/react-icons";
-import { AntennaIcon, PcCase, ServerIcon, UploadIcon } from "lucide-react";
 import { Metadata } from "next";
-import { Feature, FeatureContent, FeatureTitle } from "./_components/feature";
 
-const features = [
+const specs = [
+  { label: "Board", value: "RPi 4B" },
+  { label: "Antenna", value: "QFH" },
+  { label: "Freq", value: "137 MHz" },
+  { label: "Pol.", value: "RHCP" },
+];
+
+const chain = [
+  { kind: "Source", name: "SKY", highlight: false },
+  { kind: "Antenna", name: "QFH", highlight: true },
+  { kind: "Front-end", name: "RTL-SDR", highlight: false },
+  { kind: "Decode", name: "RPi 4B", highlight: true },
+  { kind: "Storage", name: "SUPABASE", highlight: false },
+  { kind: "Serve", name: "PERMI.DK", highlight: true },
+];
+
+const modules = [
   {
-    name: "Homemade QFH antenna.",
+    badge: "Antenna",
+    title: "Homemade QFH antenna",
     description:
-      "The QFH antenna is a type of antenna that is used to receive weather satellite signals. It is circularly polarized and has a low noise floor.",
-    icon: UploadIcon,
+      "A Quadrifilar Helix — circularly polarized and hand-built for the job. It gives clear, reliable reception of the satellite downlink regardless of pass geometry.",
   },
   {
-    name: "Raspberry 4b",
-    description: "I have a raspberry pi 4b that runs the software to receive and decode the satellite images.",
-    icon: LockClosedIcon,
+    badge: "Compute",
+    title: "Raspberry Pi 4B",
+    description: (
+      <>
+        The heart of the station, running{" "}
+        <a
+          href="https://github.com/jekhokie/raspberry-noaa-v2"
+          target="_blank"
+          rel="noreferrer"
+          className="text-accent transition-colors hover:text-accent-hover"
+        >
+          raspberry-noaa-v2
+        </a>{" "}
+        to receive and decode passes, turning raw signal into finished weather
+        maps.
+      </>
+    ),
   },
   {
-    name: "Automatic image uploading to supabase storage.",
-    description: "All processed images are automatically uploaded to a supabase storage bucket.",
-    icon: ServerIcon,
+    badge: "Storage",
+    title: "Auto-upload to Supabase",
+    description:
+      "Once processed, every image is pushed automatically to a Supabase storage bucket — securely stored and ready to serve straight to this site.",
   },
 ];
 
@@ -26,67 +54,144 @@ export const metadata: Metadata = {
   title: "My setup | permi",
 };
 
-export default async function Page() {
+function SectionHeading({
+  label,
+  meta,
+  title,
+}: {
+  label: string;
+  meta?: string;
+  title?: string;
+}) {
   return (
-    <main className="container py-16">
-      <div className="grid grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:grid-cols-2 lg:items-start">
-        <div className="px-6 lg:px-0 lg:pr-4 lg:pt-4">
-          <div className="mx-auto max-w-2xl lg:mx-0 lg:max-w-lg">
-            <h2 className="text-base font-semibold leading-7 text-gray-600">My satellite image receiving setup</h2>
-            <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Raspberry 4b + QFH antenna</p>
-            <p className="mt-6 text-lg leading-8 text-gray-600">
-              My setup features a Raspberry Pi 4b paired with a QFH antenna, enabling me to capture weather satellite images from NOAA and
-              Meteor-M2 satellites.
-            </p>
-            <dl className="mt-10 max-w-xl space-y-8 text-base leading-7 text-gray-600 lg:max-w-none">
-              <Feature>
-                <FeatureTitle>
-                  <AntennaIcon className="absolute top-1 left-1 w-5 h-5 mr-2 text-primary" />
-                  Homemade QFH antenna.
-                </FeatureTitle>
-                <FeatureContent>
-                  The QFH (Quadrifilar Helix) antenna is a specialized, circularly polarized antenna designed for receiving weather
-                  satellite signals. This provides clear and reliable reception of satellite data.
-                </FeatureContent>
-              </Feature>
-              <Feature>
-                <FeatureTitle>
-                  <PcCase className="absolute top-1 left-1 w-5 h-5 mr-2 text-primary" />
-                  Raspberry Pi 4b.
-                </FeatureTitle>
-                <FeatureContent>
-                  The Raspberry Pi 4b is the heart of my setup, running{" "}
-                  <a href="https://github.com/jekhokie/raspberry-noaa-v2" target="_blank" className="underline">
-                    Raspberry NOAA
-                  </a>{" "}
-                  software that receives and decodes the satellite images, transforming raw data into visual weather maps.
-                </FeatureContent>
-              </Feature>
-              <Feature>
-                <FeatureTitle>
-                  <UploadIcon className="absolute top-1 left-1 w-5 h-5 mr-2 text-primary" />
-                  Automatic image uploading to Supabase Storage.
-                </FeatureTitle>
-                <FeatureContent>
-                  Once processed, all images are automatically uploaded to a Supabase storage bucket. This automation ensures that the
-                  images are securely stored and easily accessible for further sharing.
-                </FeatureContent>
-              </Feature>
-            </dl>
+    <div className="mb-5 flex items-center gap-3.5 font-mono">
+      <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-accent">
+        [ {label} ]
+      </span>
+      {title && (
+        <h2 className="text-[clamp(20px,3vw,26px)] font-bold tracking-[-0.01em] text-bright">
+          {title}
+        </h2>
+      )}
+      <span aria-hidden="true" className="h-px flex-1 bg-rule" />
+      {meta && (
+        <span className="hidden text-[10px] uppercase text-faint sm:block">
+          {meta}
+        </span>
+      )}
+    </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <main className="pb-8">
+      <section className="container flex flex-wrap items-center gap-11 pb-10 pt-11">
+        <div className="min-w-[300px] flex-[1_1_440px]">
+          <div className="mb-4 font-mono text-[11px] uppercase tracking-[0.24em] text-accent">
+            {"// the rig"}
           </div>
+          <h1 className="mb-2 font-mono text-[clamp(30px,4.6vw,52px)] font-bold leading-[1.05] tracking-[-0.02em] text-[oklch(0.95_0.01_220)]">
+            My receiving setup
+          </h1>
+          <div className="mb-5 font-mono text-[15px] text-accent">
+            Raspberry Pi 4B + QFH antenna
+          </div>
+          <p className="mb-6 max-w-[54ch] text-sm leading-[1.75] text-body-muted [text-wrap:pretty]">
+            A Raspberry Pi 4B paired with a homemade QFH antenna, capturing
+            weather satellite images from NOAA and Meteor-M2 as they pass
+            overhead — recorded, decoded and archived without me lifting a
+            finger.
+          </p>
+          <dl className="grid grid-cols-[repeat(auto-fit,minmax(110px,1fr))] gap-px overflow-hidden rounded-md border border-border bg-border">
+            {specs.map((spec) => (
+              <div key={spec.label} className="bg-panel px-4 py-3">
+                <dt className="font-mono text-[9px] uppercase tracking-[0.16em] text-faint">
+                  {spec.label}
+                </dt>
+                <dd className="mt-1 font-mono text-sm text-bright">
+                  {spec.value}
+                </dd>
+              </div>
+            ))}
+          </dl>
         </div>
-        <div className="sm:px-6 lg:px-0">
-          <div className="mx-auto max-w-2xl sm:mx-0 sm:max-w-none">
+
+        <div className="panel min-w-[300px] flex-[0_1_460px] overflow-hidden">
+          <div className="relative aspect-[4/3]">
             <img
               src="/images/setup/qfh.jpeg"
               alt="A QFH antenna installed on a roof"
-              width={2432}
-              height={1442}
-              className="w-full rounded-xl"
+              className="absolute inset-0 size-full object-cover"
             />
+            <span className="absolute bottom-2.5 left-2.5 z-[2] rounded-[2px] bg-background/85 px-2 py-1 font-mono text-[9px] uppercase tracking-[0.14em] text-accent">
+              QFH · Field deploy
+            </span>
           </div>
         </div>
-      </div>
+      </section>
+
+      <section className="container pb-5">
+        <SectionHeading label="Signal path" />
+        <div className="flex flex-wrap items-center gap-2.5">
+          {chain.map((node, index) => (
+            <div key={node.name} className="flex items-center gap-2.5">
+              <div
+                className={`min-w-[104px] rounded-[5px] border bg-panel px-4 py-3.5 text-center ${
+                  node.highlight ? "border-accent/50" : "border-border"
+                }`}
+              >
+                <div className="font-mono text-[9px] uppercase tracking-[0.14em] text-faint">
+                  {node.kind}
+                </div>
+                <div
+                  className={`mt-1 font-mono text-[13px] font-bold ${
+                    node.highlight ? "text-accent" : "text-nav"
+                  }`}
+                >
+                  {node.name}
+                </div>
+              </div>
+              {index < chain.length - 1 && (
+                <span
+                  aria-hidden="true"
+                  className="font-mono text-base text-[oklch(0.5_0.06_200)]"
+                >
+                  →
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="container pb-5 pt-11">
+        <SectionHeading
+          label="Components"
+          meta={`${String(modules.length).padStart(2, "0")} MODULES`}
+          title="How it works"
+        />
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-4.5">
+          {modules.map((module, index) => (
+            <div key={module.title} className="panel px-5.5 py-6">
+              <div className="mb-4 flex items-center justify-between">
+                <span className="font-mono text-[34px] font-bold leading-none text-[oklch(0.3_0.03_250)]">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <span className="rounded-[2px] border border-accent/40 px-2 py-[3px] font-mono text-[9px] uppercase tracking-[0.16em] text-accent">
+                  {module.badge}
+                </span>
+              </div>
+              <h3 className="mb-2.5 font-mono text-base font-bold text-bright">
+                {module.title}
+              </h3>
+              <p className="text-[13px] leading-[1.7] text-body-muted [text-wrap:pretty]">
+                {module.description}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
     </main>
   );
 }

@@ -2,13 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
@@ -16,7 +9,6 @@ import {
 } from "@/components/ui/chart";
 import { RaspberryStat } from "@/models/raspberry-stat.model";
 import { format } from "date-fns";
-import { Activity, ChevronDown } from "lucide-react";
 import { useMemo, useState } from "react";
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 
@@ -50,50 +42,128 @@ const RANGES: { label: string; milliseconds: number; value: RangeKey }[] = [
   { label: "7 days", milliseconds: 7 * 24 * 60 * 60_000, value: "7d" },
 ];
 
+const SPARKLINE_WINDOW_MS = 6 * 60 * 60_000;
+
 const cpuUsageConfig = {
-  cpuUsage: { label: "CPU usage", color: "#2563eb" },
+  cpuUsage: { label: "CPU usage", color: "oklch(0.85 0.17 155)" },
 } satisfies ChartConfig;
 
 const cpuTemperatureConfig = {
-  cpuTemperature: { label: "CPU temperature", color: "#ef4444" },
+  cpuTemperature: { label: "CPU temperature", color: "oklch(0.8 0.14 75)" },
 } satisfies ChartConfig;
 
 const memoryConfig = {
-  memoryUsed: { label: "Used", color: "#7c3aed" },
-  memoryTotal: { label: "Total", color: "#c4b5fd" },
+  memoryUsed: { label: "Used", color: "oklch(0.85 0.17 155)" },
+  memoryTotal: { label: "Total", color: "oklch(0.45 0.03 240)" },
 } satisfies ChartConfig;
 
 const diskConfig = {
-  diskUsed: { label: "Used", color: "#0891b2" },
-  diskTotal: { label: "Total", color: "#a5f3fc" },
+  diskUsed: { label: "Used", color: "oklch(0.8 0.1 220)" },
+  diskTotal: { label: "Total", color: "oklch(0.45 0.03 240)" },
 } satisfies ChartConfig;
 
 function bytesToGiB(value: number | null) {
   return value === null ? null : Number((value / 1024 ** 3).toFixed(2));
 }
 
-function formatBytes(value: number | null) {
-  if (value === null) return "Unavailable";
-  return `${(value / 1024 ** 3).toFixed(1)} GiB`;
+function formatGiB(value: number | null) {
+  if (value === null) return "—";
+  return (value / 1024 ** 3).toFixed(1);
 }
 
 function formatUptime(value: number | null) {
-  if (value === null) return "Unavailable";
+  if (value === null) return "—";
   const totalHours = Math.floor(value / 3_600_000);
   const days = Math.floor(totalHours / 24);
   const hours = totalHours % 24;
   return days > 0 ? `${days}d ${hours}h` : `${hours}h`;
 }
 
-function StatCard({ label, value }: { label: string; value: string }) {
+function buildTrace(values: number[]) {
+  if (values.length === 0) return null;
+
+  const points = values.length === 1 ? [values[0], values[0]] : values;
+  const min = Math.min(...points);
+  const max = Math.max(...points);
+  const pad = Math.max((max - min) * 0.15, 1e-6);
+  const lo = min - pad;
+  const hi = max + pad;
+
+  const x0 = 6;
+  const x1 = 314;
+  const top = 14;
+  const base = 90;
+
+  const coordinates = points.map((value, index) => {
+    const x = x0 + (x1 - x0) * (index / (points.length - 1));
+    const fraction = Math.max(0, Math.min(1, (value - lo) / (hi - lo)));
+    const y = base - fraction * (base - top);
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  });
+
+  const line = coordinates.join(" ");
+  const area = `${x0},100 ${line} ${x1},100`;
+  return { area, line };
+}
+
+function MetricSparkline({
+  label,
+  sub,
+  trace,
+  unit,
+  value,
+}: {
+  label: string;
+  sub: string;
+  trace: { area: string; line: string } | null;
+  unit: string;
+  value: string;
+}) {
   return (
-    <div className="border-t border-[#d9e4e3] px-4 py-5 first:border-t-0 sm:border-l sm:border-t-0 sm:first:border-l-0 lg:px-6">
-      <dt className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[#5c6f76]">
-        {label}
-      </dt>
-      <dd className="mt-2 text-xl font-semibold tracking-[-0.035em] text-[#10212b] lg:text-2xl">
-        {value}
-      </dd>
+    <div className="panel p-4.5 pb-3.5">
+      <div className="mb-3 flex items-end justify-between gap-3">
+        <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+          {label}
+        </span>
+        <span className="flex items-baseline gap-1.5">
+          <span className="font-mono text-2xl font-bold leading-[0.9] text-bright">
+            {value}
+          </span>
+          <span className="font-mono text-[10px] text-faint">{unit}</span>
+        </span>
+      </div>
+      <div className="chart-grid overflow-hidden rounded-[3px] border border-rule">
+        {trace ? (
+          <svg
+            viewBox="0 0 320 100"
+            preserveAspectRatio="none"
+            className="block h-[82px] w-full"
+          >
+            <polygon
+              points={trace.area}
+              fill="oklch(0.85 0.17 155 / 0.14)"
+              stroke="none"
+            />
+            <polyline
+              points={trace.line}
+              fill="none"
+              stroke="oklch(0.85 0.17 155)"
+              strokeWidth="1.8"
+              strokeLinejoin="round"
+              strokeLinecap="round"
+            />
+          </svg>
+        ) : (
+          <div className="flex h-[82px] items-center justify-center font-mono text-[10px] uppercase tracking-[0.14em] text-faint">
+            No data
+          </div>
+        )}
+      </div>
+      <div className="mt-2 flex justify-between font-mono text-[9px] uppercase tracking-[0.1em] text-faint">
+        <span>-6H</span>
+        <span>{sub}</span>
+        <span>Now</span>
+      </div>
     </div>
   );
 }
@@ -101,7 +171,6 @@ function StatCard({ label, value }: { label: string; value: string }) {
 function MetricChart({
   config,
   data,
-  description,
   range,
   series,
   title,
@@ -109,230 +178,199 @@ function MetricChart({
 }: {
   config: ChartConfig;
   data: ChartPoint[];
-  description: string;
   range: RangeKey;
   series: Series[];
   title: string;
   unit: string;
 }) {
   return (
-    <Card className="rounded-2xl border-[#d9e4e3] shadow-none">
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        {data.length > 0 ? (
-          <ChartContainer config={config} className="h-64 w-full">
-            <LineChart
-              accessibilityLayer
-              data={data}
-              margin={{ left: 4, right: 12 }}
-            >
-              <CartesianGrid vertical={false} />
-              <XAxis
-                axisLine={false}
-                dataKey="timestamp"
-                minTickGap={32}
-                tickFormatter={(value) =>
-                  format(new Date(value), range === "7d" ? "dd. MMM" : "HH:mm")
-                }
-                tickLine={false}
-                tickMargin={10}
-                type="number"
-                domain={["dataMin", "dataMax"]}
-              />
-              <YAxis
-                axisLine={false}
-                tickFormatter={(value) => `${value}${unit}`}
-                tickLine={false}
-                width={48}
-              />
-              <ChartTooltip
-                content={
-                  <ChartTooltipContent
-                    labelFormatter={(_, payload) => {
-                      const recordedAt = payload?.[0]?.payload?.recordedAt;
-                      return recordedAt
-                        ? format(new Date(recordedAt), "dd. MMM yyyy @ HH:mm")
-                        : "";
-                    }}
-                  />
-                }
-              />
-              {series.map((item) => (
-                <Line
-                  connectNulls={false}
-                  dataKey={item.dataKey}
-                  dot={false}
-                  key={item.dataKey}
-                  stroke={item.stroke}
-                  strokeWidth={2}
-                  type="monotone"
+    <div className="panel p-4.5">
+      <p className="mb-4 font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+        {title}
+      </p>
+      {data.length > 0 ? (
+        <ChartContainer config={config} className="h-64 w-full">
+          <LineChart
+            accessibilityLayer
+            data={data}
+            margin={{ left: 4, right: 12 }}
+          >
+            <CartesianGrid stroke="var(--rule)" vertical={false} />
+            <XAxis
+              axisLine={false}
+              dataKey="timestamp"
+              minTickGap={32}
+              tickFormatter={(value) =>
+                format(new Date(value), range === "7d" ? "dd. MMM" : "HH:mm")
+              }
+              tickLine={false}
+              tickMargin={10}
+              type="number"
+              domain={["dataMin", "dataMax"]}
+            />
+            <YAxis
+              axisLine={false}
+              tickFormatter={(value) => `${value}${unit}`}
+              tickLine={false}
+              width={48}
+            />
+            <ChartTooltip
+              content={
+                <ChartTooltipContent
+                  labelFormatter={(_, payload) => {
+                    const recordedAt = payload?.[0]?.payload?.recordedAt;
+                    return recordedAt
+                      ? format(new Date(recordedAt), "dd. MMM yyyy @ HH:mm")
+                      : "";
+                  }}
                 />
-              ))}
-            </LineChart>
-          </ChartContainer>
-        ) : (
-          <div className="flex h-64 items-center justify-center text-sm text-muted-foreground">
-            No samples in this time range.
-          </div>
-        )}
-      </CardContent>
-    </Card>
+              }
+            />
+            {series.map((item) => (
+              <Line
+                connectNulls={false}
+                dataKey={item.dataKey}
+                dot={false}
+                key={item.dataKey}
+                stroke={item.stroke}
+                strokeWidth={1.8}
+                type="monotone"
+              />
+            ))}
+          </LineChart>
+        </ChartContainer>
+      ) : (
+        <div className="flex h-64 items-center justify-center font-mono text-[10px] uppercase tracking-[0.14em] text-faint">
+          No samples in this time range.
+        </div>
+      )}
+    </div>
   );
 }
 
-function UptimeTimeline({
+function UptimeStrip({
   data,
-  range,
   referenceTime,
+  showHistory,
+  onToggleHistory,
 }: {
   data: ChartPoint[];
-  range: RangeKey;
+  onToggleHistory: () => void;
   referenceTime: number;
+  showHistory: boolean;
 }) {
   const validData = data.filter(
     (point): point is ChartPoint & { uptime: number } => point.uptime !== null,
   );
 
+  const historyToggle = (
+    <button
+      type="button"
+      onClick={onToggleHistory}
+      aria-expanded={showHistory}
+      className="rounded-[2px] border border-accent/40 px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.12em] text-accent transition-colors hover:border-accent/70 hover:text-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+    >
+      Telemetry history {showHistory ? "↑" : "→"}
+    </button>
+  );
+
   if (validData.length === 0) {
     return (
-      <Card className="rounded-2xl border-[#d9e4e3] shadow-none lg:col-span-2">
-        <CardHeader>
-          <CardTitle>Uptime</CardTitle>
-          <CardDescription>
-            No uptime readings in this time range.
-          </CardDescription>
-        </CardHeader>
-      </Card>
+      <div className="panel mt-4.5 flex flex-wrap items-center justify-between gap-6 p-5">
+        <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-faint">
+          No uptime readings in the last 6 hours.
+        </p>
+        {historyToggle}
+      </div>
     );
   }
 
-  const selectedRange = RANGES.find((item) => item.value === range)!;
-  const windowStart = referenceTime - selectedRange.milliseconds;
+  const windowStart = referenceTime - SPARKLINE_WINDOW_MS;
   const latest = validData.at(-1)!;
-  const inferredBootTime = latest.timestamp - latest.uptime * 3_600_000;
+  const runStarted = latest.timestamp - latest.uptime;
   const restartEvents = validData.slice(1).flatMap((point, index) => {
     const previous = validData[index];
-
-    if (point.uptime < previous.uptime - 0.1) {
-      return [point.timestamp - point.uptime * 3_600_000];
+    if (point.uptime < previous.uptime - 6_000) {
+      return [point.timestamp - point.uptime];
     }
-
     return [];
   });
 
   const positionFor = (timestamp: number) =>
     Math.min(
       100,
-      Math.max(
-        0,
-        ((timestamp - windowStart) / selectedRange.milliseconds) * 100,
-      ),
+      Math.max(0, ((timestamp - windowStart) / SPARKLINE_WINDOW_MS) * 100),
     );
-  const observedStart = positionFor(validData[0].timestamp);
-  const observedEnd = positionFor(latest.timestamp);
 
   return (
-    <Card className="rounded-2xl border-[#d9e4e3] shadow-none lg:col-span-2">
-      <CardHeader className="gap-1">
-        <CardTitle>Uptime continuity</CardTitle>
-        <CardDescription>
-          Restarts detected when the station&apos;s reported uptime resets.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <dl className="grid overflow-hidden rounded-xl border border-[#d9e4e3] sm:grid-cols-3">
-          <div className="p-4 sm:p-5">
-            <dt className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[#5c6f76]">
-              Current run
-            </dt>
-            <dd className="mt-1.5 text-xl font-semibold tracking-[-0.03em]">
-              {formatUptime(latest.uptime * 3_600_000)}
-            </dd>
+    <div className="panel mt-4.5 p-5">
+      <div className="flex flex-wrap items-center justify-between gap-6 font-mono">
+        <div className="flex flex-wrap gap-8">
+          <div>
+            <div className="text-[9px] uppercase tracking-[0.16em] text-faint">
+              Uptime
+            </div>
+            <div className="mt-1 text-[17px] text-bright">
+              {formatUptime(latest.uptime)}
+            </div>
           </div>
-          <div className="border-t border-[#d9e4e3] p-4 sm:border-l sm:border-t-0 sm:p-5">
-            <dt className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[#5c6f76]">
-              Current run started
-            </dt>
-            <dd className="mt-1.5 text-xl font-semibold tracking-[-0.03em]">
-              {format(new Date(inferredBootTime), "dd MMM · HH:mm")}
-            </dd>
+          <div>
+            <div className="text-[9px] uppercase tracking-[0.16em] text-faint">
+              Run started
+            </div>
+            <div className="mt-1 text-[17px] text-bright">
+              {format(new Date(runStarted), "dd MMM HH:mm").toUpperCase()}
+            </div>
           </div>
-          <div className="border-t border-[#d9e4e3] p-4 sm:border-l sm:border-t-0 sm:p-5">
-            <dt className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[#5c6f76]">
-              Restarts in window
-            </dt>
-            <dd className="mt-1.5 text-xl font-semibold tracking-[-0.03em]">
-              {restartEvents.length}
-            </dd>
-          </div>
-        </dl>
-
-        <div className="mt-8">
-          <div className="mb-3 flex items-center justify-between gap-4 text-xs text-[#5c6f76]">
-            <span>
-              {format(
-                new Date(windowStart),
-                range === "7d" ? "dd MMM" : "HH:mm",
-              )}
-            </span>
-            <span className="flex items-center gap-2 font-medium text-[#2e7d5b]">
-              <span className="size-1.5 rounded-full bg-[#2e7d5b]" />
-              {restartEvents.length === 0
-                ? "No restarts detected"
-                : `${restartEvents.length} ${restartEvents.length === 1 ? "restart" : "restarts"} detected`}
-            </span>
-            <span>Now</span>
-          </div>
-
-          <div className="relative h-8" aria-label="Uptime restart timeline">
-            <div className="absolute inset-x-0 top-3 h-1 rounded-full bg-[#e7efef]" />
+          <div>
+            <div className="text-[9px] uppercase tracking-[0.16em] text-faint">
+              Restarts / win
+            </div>
             <div
-              className="absolute top-3 h-1 rounded-full bg-[#2e7d5b]"
-              style={{
-                left: `${observedStart}%`,
-                width: `${Math.max(1, observedEnd - observedStart)}%`,
-              }}
-            />
-            {restartEvents.map((timestamp) => (
-              <span
-                key={timestamp}
-                title={`Restart around ${format(new Date(timestamp), "dd MMM yyyy · HH:mm")}`}
-                className="absolute top-0 h-7 w-0.5 -translate-x-1/2 rounded-full bg-[#e8a735]"
-                style={{ left: `${positionFor(timestamp)}%` }}
-              >
-                <span className="absolute -left-1 top-2 size-2.5 rounded-full border-2 border-white bg-[#e8a735]" />
-              </span>
-            ))}
-          </div>
-
-          <div className="mt-1 flex items-center gap-5 font-mono text-[10px] uppercase tracking-[0.12em] text-[#5c6f76]">
-            <span className="flex items-center gap-1.5">
-              <span className="h-1 w-4 rounded-full bg-[#2e7d5b]" /> Reported
-              uptime
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="h-3 w-0.5 bg-[#e8a735]" /> Restart
-            </span>
+              className={`mt-1 text-[17px] ${restartEvents.length > 0 ? "text-warn" : "text-bright"}`}
+            >
+              {restartEvents.length}
+            </div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+        {historyToggle}
+      </div>
+      <div className="mt-4">
+        <div className="relative h-2.5 overflow-hidden rounded-[2px] bg-accent/80">
+          {restartEvents.map((timestamp) => (
+            <div
+              key={timestamp}
+              title={`Restart around ${format(new Date(timestamp), "dd MMM yyyy · HH:mm")}`}
+              className="absolute inset-y-0 w-[2px] bg-warn"
+              style={{ left: `${positionFor(timestamp)}%` }}
+            />
+          ))}
+        </div>
+        <div className="mt-1.5 flex justify-between font-mono text-[9px] uppercase tracking-[0.1em] text-faint">
+          <span>{format(new Date(windowStart), "HH:mm")}</span>
+          {restartEvents.length > 0 ? (
+            <span className="text-warn">
+              {format(new Date(restartEvents[0]), "HH:mm")} · RESTART
+            </span>
+          ) : (
+            <span>NO RESTARTS</span>
+          )}
+          <span>{format(new Date(referenceTime), "HH:mm")}</span>
+        </div>
+      </div>
+    </div>
   );
 }
 
 export default function StatsDashboard({ referenceTime, stats }: Props) {
   const [range, setRange] = useState<RangeKey>("24h");
+  const [showHistory, setShowHistory] = useState(false);
   const latest = stats.at(-1)!;
   const selectedRange = RANGES.find((item) => item.value === range)!;
-  const data = useMemo(() => {
-    const cutoff = referenceTime - selectedRange.milliseconds;
 
-    return stats
-      .filter((stat) => new Date(stat.recorded_at).getTime() >= cutoff)
-      .map<ChartPoint>((stat) => ({
+  const allPoints = useMemo(
+    () =>
+      stats.map<ChartPoint>((stat) => ({
         cpuTemperature: stat.cpu_temperature_c,
         cpuUsage: stat.cpu_usage_percent,
         diskTotal: bytesToGiB(stat.disk_total_bytes),
@@ -341,69 +379,107 @@ export default function StatsDashboard({ referenceTime, stats }: Props) {
         memoryUsed: bytesToGiB(stat.memory_used_bytes),
         recordedAt: stat.recorded_at,
         timestamp: new Date(stat.recorded_at).getTime(),
+        uptime: stat.uptime_ms,
+      })),
+    [stats],
+  );
+
+  const sparklinePoints = useMemo(
+    () =>
+      allPoints.filter(
+        (point) => point.timestamp >= referenceTime - SPARKLINE_WINDOW_MS,
+      ),
+    [allPoints, referenceTime],
+  );
+
+  const historyData = useMemo(() => {
+    const cutoff = referenceTime - selectedRange.milliseconds;
+    return allPoints
+      .filter((point) => point.timestamp >= cutoff)
+      .map((point) => ({
+        ...point,
         uptime:
-          stat.uptime_ms === null
+          point.uptime === null
             ? null
-            : Number((stat.uptime_ms / 3_600_000).toFixed(1)),
+            : Number((point.uptime / 3_600_000).toFixed(1)),
       }));
-  }, [referenceTime, selectedRange.milliseconds, stats]);
+  }, [allPoints, referenceTime, selectedRange.milliseconds]);
+
+  const metrics = useMemo(() => {
+    const values = (selector: (point: ChartPoint) => number | null) =>
+      sparklinePoints
+        .map(selector)
+        .filter((value): value is number => value !== null);
+
+    const usage = values((point) => point.cpuUsage);
+    const temperature = values((point) => point.cpuTemperature);
+    const memory = values((point) => point.memoryUsed);
+    const disk = values((point) => point.diskUsed);
+
+    return [
+      {
+        label: "CPU usage",
+        sub: usage.length
+          ? `PEAK ${Math.max(...usage).toFixed(0)}%`
+          : "NO DATA",
+        trace: buildTrace(usage),
+        unit: "%",
+        value:
+          latest.cpu_usage_percent === null
+            ? "—"
+            : latest.cpu_usage_percent.toFixed(1),
+      },
+      {
+        label: "CPU temp",
+        sub: temperature.length
+          ? `${Math.min(...temperature).toFixed(0)}–${Math.max(...temperature).toFixed(0)}°C`
+          : "NO DATA",
+        trace: buildTrace(temperature),
+        unit: "°C",
+        value:
+          latest.cpu_temperature_c === null
+            ? "—"
+            : latest.cpu_temperature_c.toFixed(1),
+      },
+      {
+        label: "Memory",
+        sub: "USED",
+        trace: buildTrace(memory),
+        unit: `/ ${formatGiB(latest.memory_total_bytes)} GiB`,
+        value: formatGiB(latest.memory_used_bytes),
+      },
+      {
+        label: "Disk",
+        sub: "USED",
+        trace: buildTrace(disk),
+        unit: `/ ${formatGiB(latest.disk_total_bytes)} GiB`,
+        value: formatGiB(latest.disk_used_bytes),
+      },
+    ];
+  }, [latest, sparklinePoints]);
 
   return (
-    <div className="mt-8">
-      <dl className="grid overflow-hidden rounded-2xl border border-[#d9e4e3] bg-white sm:grid-cols-2 lg:grid-cols-5">
-        <StatCard
-          label="CPU temperature"
-          value={
-            latest.cpu_temperature_c === null
-              ? "Unavailable"
-              : `${latest.cpu_temperature_c.toFixed(1)}°C`
-          }
-        />
-        <StatCard
-          label="CPU usage"
-          value={
-            latest.cpu_usage_percent === null
-              ? "Unavailable"
-              : `${latest.cpu_usage_percent.toFixed(1)}%`
-          }
-        />
-        <StatCard
-          label="Memory"
-          value={`${formatBytes(latest.memory_used_bytes)} / ${formatBytes(
-            latest.memory_total_bytes,
-          )}`}
-        />
-        <StatCard
-          label="Disk"
-          value={`${formatBytes(latest.disk_used_bytes)} / ${formatBytes(
-            latest.disk_total_bytes,
-          )}`}
-        />
-        <StatCard label="Uptime" value={formatUptime(latest.uptime_ms)} />
-      </dl>
+    <div>
+      <div className="grid grid-cols-1 gap-4.5 sm:grid-cols-2 xl:grid-cols-4">
+        {metrics.map((metric) => (
+          <MetricSparkline key={metric.label} {...metric} />
+        ))}
+      </div>
 
-      <details className="group mt-5 rounded-2xl border border-[#d9e4e3] bg-white">
-        <summary className="flex cursor-pointer list-none items-center justify-between gap-5 px-5 py-4 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#256a8a] sm:px-6 [&::-webkit-details-marker]:hidden">
-          <span className="flex items-center gap-3">
-            <span className="flex size-9 items-center justify-center rounded-full bg-[#e7efef] text-[#256a8a]">
-              <Activity className="size-4" />
-            </span>
-            <span>
-              <span className="block text-sm font-semibold">
-                View telemetry history
-              </span>
-              <span className="mt-0.5 block text-xs text-[#5c6f76]">
-                Last sample{" "}
-                {format(new Date(latest.recorded_at), "dd MMM yyyy · HH:mm")}
-              </span>
-            </span>
-          </span>
-          <ChevronDown className="size-4 shrink-0 transition-transform group-open:rotate-180" />
-        </summary>
+      <UptimeStrip
+        data={sparklinePoints}
+        onToggleHistory={() => setShowHistory((value) => !value)}
+        referenceTime={referenceTime}
+        showHistory={showHistory}
+      />
 
-        <div className="border-t border-[#d9e4e3] p-5 sm:p-6">
-          <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm text-[#5c6f76]">Choose a time range</p>
+      {showHistory && (
+        <div className="mt-4.5">
+          <div className="mb-4.5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+              Telemetry history · last sample{" "}
+              {format(new Date(latest.recorded_at), "dd MMM yyyy · HH:mm")}
+            </p>
             <div className="flex flex-wrap gap-2" aria-label="Chart time range">
               {RANGES.map((item) => (
                 <Button
@@ -418,11 +494,10 @@ export default function StatsDashboard({ referenceTime, stats }: Props) {
             </div>
           </div>
 
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div className="grid gap-4.5 lg:grid-cols-2">
             <MetricChart
               config={cpuUsageConfig}
-              data={data}
-              description="Average processor utilization per sample."
+              data={historyData}
               range={range}
               series={[
                 { dataKey: "cpuUsage", stroke: "var(--color-cpuUsage)" },
@@ -432,8 +507,7 @@ export default function StatsDashboard({ referenceTime, stats }: Props) {
             />
             <MetricChart
               config={cpuTemperatureConfig}
-              data={data}
-              description="Processor temperature reported by the Raspberry Pi."
+              data={historyData}
               range={range}
               series={[
                 {
@@ -446,8 +520,7 @@ export default function StatsDashboard({ referenceTime, stats }: Props) {
             />
             <MetricChart
               config={memoryConfig}
-              data={data}
-              description="Used memory compared with total installed memory."
+              data={historyData}
               range={range}
               series={[
                 { dataKey: "memoryUsed", stroke: "var(--color-memoryUsed)" },
@@ -458,8 +531,7 @@ export default function StatsDashboard({ referenceTime, stats }: Props) {
             />
             <MetricChart
               config={diskConfig}
-              data={data}
-              description="Used space compared with total space on the monitored disk."
+              data={historyData}
               range={range}
               series={[
                 { dataKey: "diskUsed", stroke: "var(--color-diskUsed)" },
@@ -468,14 +540,9 @@ export default function StatsDashboard({ referenceTime, stats }: Props) {
               title="Disk"
               unit=" GiB"
             />
-            <UptimeTimeline
-              data={data}
-              range={range}
-              referenceTime={referenceTime}
-            />
           </div>
         </div>
-      </details>
+      )}
     </div>
   );
 }

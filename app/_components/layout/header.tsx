@@ -1,42 +1,73 @@
-import { GitHubLogoIcon } from "@radix-ui/react-icons";
-import { SatelliteDish } from "lucide-react";
+import { createServiceClient } from "@/lib/supabase";
+import { differenceInMinutes } from "date-fns";
 import Link from "next/link";
 import { NavLink } from "./nav-link";
 
-export default function Header() {
+async function getLastSampleTime() {
+  try {
+    const supabase = createServiceClient();
+    const { data } = await supabase
+      .from("raspberry_stats")
+      .select("recorded_at")
+      .order("recorded_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    return data?.recorded_at ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export default async function Header() {
+  const lastSample = await getLastSampleTime();
+  const minutesAgo = lastSample
+    ? Math.max(0, differenceInMinutes(new Date(), new Date(lastSample)))
+    : null;
+  const isReporting = minutesAgo !== null && minutesAgo < 20;
+
   return (
-    <header className="sticky top-0 z-40 border-b border-[#d9e4e3]/80 bg-[#f7faf9]/90 backdrop-blur-xl">
-      <div className="container flex h-16 items-center justify-between">
+    <header className="sticky top-0 z-40 border-b border-border bg-panel-raised/90 backdrop-blur-md">
+      <div className="container flex items-center justify-between gap-4 py-2.5 font-mono">
         <Link
           href="/"
-          className="flex items-center gap-2.5 font-bold tracking-[-0.02em] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#256a8a]"
+          className="flex items-center gap-3 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
         >
-          <span className="flex size-8 items-center justify-center rounded-full bg-[#10212b] text-white">
-            <SatelliteDish className="size-4" />
-          </span>
-          <span>permi</span>
-          <span className="hidden font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-[#5c6f76] md:inline">
-            Ground station
+          <span className="size-[11px] rounded-full bg-accent shadow-[0_0_10px_var(--accent)]" />
+          <span className="text-base font-bold tracking-[0.14em]">PERMI</span>
+          <span className="hidden border-l border-border pl-3 text-[10px] tracking-[0.24em] text-muted-foreground sm:inline">
+            GND&nbsp;STATION
           </span>
         </Link>
         <nav>
-          <ul className="flex items-center gap-4 sm:gap-6">
-            <NavLink href="/#passes" className="font-medium text-sm">
-              Passes
-            </NavLink>
-            <NavLink href="/setup" className="font-medium text-sm">
-              Setup
-            </NavLink>
-            <NavLink
-              href="https://github.com/perhp/permi"
-              target="_blank"
-              aria-label="View permi on GitHub"
-              className="rounded-full bg-[#e7efef] p-2 transition-colors hover:bg-[#d9e4e3]"
-            >
-              <GitHubLogoIcon className="w-5 h-5" />
+          <ul className="flex items-center gap-4 text-[11px] uppercase tracking-[0.14em] sm:gap-5">
+            <NavLink href="/#captures">Captures</NavLink>
+            <NavLink href="/#schedule">Passes</NavLink>
+            <NavLink href="/setup">Setup</NavLink>
+            <NavLink href="https://github.com/perhp/permi" target="_blank">
+              GitHub
             </NavLink>
           </ul>
         </nav>
+      </div>
+      <div className="border-t border-rule bg-panel-inset">
+        <div className="container flex flex-wrap gap-x-5 gap-y-1 py-1.5 text-[10.5px] tracking-[0.08em] text-muted-foreground">
+          {isReporting ? (
+            <span className="text-accent">● ONLINE</span>
+          ) : (
+            <span className="text-warn">● STANDBY</span>
+          )}
+          <span className="hidden sm:inline">LAT 55.67 N · LON 12.57 E</span>
+          <span className="hidden md:inline">ANT QFH · 137MHZ</span>
+          {lastSample && (
+            <span>
+              LAST SAMPLE{" "}
+              {new Date(lastSample).toISOString().slice(11, 16)}{" "}
+              UTC
+              <span className="animate-blink text-accent">_</span>
+            </span>
+          )}
+        </div>
       </div>
     </header>
   );

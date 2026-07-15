@@ -2,7 +2,6 @@ import { createServiceClient } from "@/lib/supabase";
 import { RaspberryStat } from "@/models/raspberry-stat.model";
 import { passQuery } from "@/queries/pass.query";
 import { subDays } from "date-fns";
-import { Activity, RadioTower, ScanLine } from "lucide-react";
 import { Metadata } from "next";
 import LandingHero from "../_components/home/landing-hero";
 import PassesList from "../_components/passes-list/passes-list";
@@ -47,34 +46,26 @@ async function loadStats(cutoff: string) {
 }
 
 function SectionHeading({
-  description,
-  icon: Icon,
   label,
+  meta,
   title,
 }: {
-  description: string;
-  icon: typeof RadioTower;
   label: string;
+  meta: string;
   title: string;
 }) {
   return (
-    <header className="border-b border-[#cbdada] pb-7 sm:pb-8">
-      <div className="flex items-center gap-3 text-[#256a8a]">
-        <span className="flex size-8 items-center justify-center rounded-full bg-[#e7efef]">
-          <Icon className="size-3.5" />
-        </span>
-        <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em]">
-          {label}
-        </p>
-      </div>
-      <div className="mt-5">
-        <h2 className="max-w-3xl text-4xl font-semibold tracking-[-0.055em] text-[#10212b] sm:text-5xl">
-          {title}
-        </h2>
-        <p className="mt-3 max-w-2xl text-sm leading-6 text-[#5c6f76]">
-          {description}
-        </p>
-      </div>
+    <header className="mb-5 flex items-center gap-3.5 font-mono">
+      <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-accent">
+        [ {label} ]
+      </p>
+      <h2 className="text-[clamp(20px,3vw,26px)] font-bold tracking-[-0.01em] text-bright">
+        {title}
+      </h2>
+      <span aria-hidden="true" className="h-px flex-1 bg-rule" />
+      <p className="hidden text-[10px] uppercase text-faint sm:block">
+        {meta}
+      </p>
     </header>
   );
 }
@@ -116,60 +107,45 @@ export default async function Page() {
 
   return (
     <>
-      <LandingHero
-        latestStat={stats.at(-1) ?? null}
-        nextPass={upcomingPasses[0] ?? null}
-        now={now}
-        passCount={passes.length}
-      />
+      <LandingHero nextPass={upcomingPasses[0] ?? null} />
 
       <main>
-        <section id="schedule" className="scroll-mt-20 py-20 sm:py-28">
+        <section id="captures" className="scroll-mt-28 py-10">
           <div className="container">
             <SectionHeading
-              description="The receiver starts automatically for each window. Higher passes usually produce a clearer signal."
-              icon={RadioTower}
-              label="Schedule"
-              title="Upcoming passes"
-            />
-            {upcomingPasses.length > 0 ? (
-              <UpcomingPassesList passes={upcomingPasses} />
-            ) : (
-              <div className="mt-10 rounded-2xl border border-dashed border-[#cbdada] p-10 text-center text-[#5c6f76]">
-                No passes are scheduled yet. The archive remains available
-                below.
-              </div>
-            )}
-          </div>
-        </section>
-
-        <section
-          id="passes"
-          className="scroll-mt-20 border-y border-[#d9e4e3] bg-white py-20 sm:py-28"
-        >
-          <div className="container">
-            <SectionHeading
-              description={`${passes.length} received passes, newest first. Open a capture to explore every processed channel and signal graph.`}
-              icon={ScanLine}
               label="Archive"
+              meta={`${String(passes.length).padStart(2, "0")} FILES`}
               title="Recent captures"
             />
             <PassesList passes={passes} />
           </div>
         </section>
 
-        <section id="station" className="scroll-mt-20 py-20 sm:py-28">
+        <section id="schedule" className="scroll-mt-28 py-12">
           <div className="container">
             <SectionHeading
-              description="Current Raspberry Pi readings, with historical telemetry available when you need it."
-              icon={Activity}
-              label="Receiver"
-              title="Station health"
+              label="Schedule"
+              meta="AUTO-REC"
+              title="Upcoming passes"
             />
+            {upcomingPasses.length > 0 ? (
+              <UpcomingPassesList passes={upcomingPasses} />
+            ) : (
+              <div className="panel border-dashed p-10 text-center text-sm text-body-muted">
+                No passes are scheduled yet. The archive remains available
+                above.
+              </div>
+            )}
+          </div>
+        </section>
+
+        <section id="station" className="scroll-mt-28 py-12">
+          <div className="container">
+            <SectionHeading label="Receiver" meta="6H · RPi" title="Station health" />
             {stats.length > 0 ? (
               <StatsDashboard referenceTime={now.getTime()} stats={stats} />
             ) : (
-              <div className="mt-10 rounded-2xl border border-dashed border-[#cbdada] p-10 text-center text-[#5c6f76]">
+              <div className="panel border-dashed p-10 text-center text-sm text-body-muted">
                 No station readings have been recorded yet.
               </div>
             )}
