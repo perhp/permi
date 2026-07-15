@@ -1,85 +1,102 @@
-"use client";
-
 import { UpcomingPass } from "@/models/upcoming-pass.model";
 import { format } from "date-fns";
-import { Clock3, Compass, Satellite, TrendingUp } from "lucide-react";
+import { ArrowDown, Compass, MoveRight, Satellite } from "lucide-react";
 
 type Props = {
   passes: UpcomingPass[];
 };
 
 function formatDegrees(value: number) {
-  return `${Number(value).toFixed(0)}\u00b0`;
+  return `${Number(value).toFixed(0)}°`;
+}
+
+function PassCard({
+  pass,
+  position,
+}: {
+  pass: UpcomingPass;
+  position: number;
+}) {
+  return (
+    <li className="relative flex min-h-64 flex-col justify-between border-l border-[#cbdada] px-5 pb-5 pt-9 first:border-l-0 lg:px-6">
+      <span className="absolute left-[-5px] top-[-5px] size-2.5 rounded-full border-2 border-[#f7faf9] bg-[#256a8a] first:left-0 lg:first:left-5" />
+      <div>
+        <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.17em] text-[#5c6f76]">
+          Pass {String(position).padStart(2, "0")} · {pass.direction}
+        </p>
+        <h3 className="mt-3 text-2xl font-semibold tracking-[-0.035em] text-[#10212b]">
+          {pass.satellite_name}
+        </h3>
+        <time
+          dateTime={pass.pass_start}
+          className="mt-1 block text-sm text-[#4e646b]"
+        >
+          {format(new Date(pass.pass_start), "EEEE, dd MMM")}
+        </time>
+        <p className="mt-5 text-3xl font-semibold tracking-[-0.04em]">
+          {format(new Date(pass.pass_start), "HH:mm")}
+          <span className="ml-2 text-sm font-normal tracking-normal text-[#5c6f76]">
+            to {format(new Date(pass.pass_end), "HH:mm")}
+          </span>
+        </p>
+      </div>
+
+      <dl className="mt-8 grid grid-cols-2 gap-3 border-t border-[#d9e4e3] pt-4 text-xs">
+        <div>
+          <dt className="flex items-center gap-1.5 text-[#5c6f76]">
+            <Satellite className="size-3.5" /> Peak
+          </dt>
+          <dd className="mt-1 font-mono font-semibold">
+            {formatDegrees(pass.max_elevation)}
+          </dd>
+        </div>
+        <div>
+          <dt className="flex items-center gap-1.5 text-[#5c6f76]">
+            <Compass className="size-3.5" /> Azimuth
+          </dt>
+          <dd className="mt-1 flex items-center gap-1 font-mono font-semibold">
+            {formatDegrees(pass.pass_start_azimuth)}
+            <MoveRight className="size-3" />
+            {formatDegrees(pass.azimuth_at_max)}
+          </dd>
+        </div>
+      </dl>
+    </li>
+  );
 }
 
 export default function UpcomingPassesList({ passes }: Props) {
+  const visiblePasses = passes.slice(0, 4);
+  const laterPasses = passes.slice(4);
+
   return (
-    <ul className="mt-8 divide-y divide-gray-100 overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
-      {passes.map((pass) => (
-        <li
-          key={pass.id}
-          className="grid gap-6 p-5 md:grid-cols-[minmax(12rem,1.2fr)_2fr] md:items-center md:p-6"
-        >
-          <div className="flex items-center gap-4">
-            <div className="flex size-11 shrink-0 items-center justify-center rounded-full bg-black text-white">
-              <Satellite className="size-5" />
-            </div>
-            <div>
-              <h2 className="text-xl font-bold text-black">
-                {pass.satellite_name}
-              </h2>
-              <p className="text-sm text-gray-500">{pass.direction}</p>
-            </div>
-          </div>
+    <div className="mt-10">
+      <ol className="relative grid border-y border-[#cbdada] pt-px sm:grid-cols-2 lg:grid-cols-4">
+        <span
+          aria-hidden="true"
+          className="absolute left-0 right-0 top-0 h-px bg-[#256a8a]/45"
+        />
+        {visiblePasses.map((pass, index) => (
+          <PassCard key={pass.id} pass={pass} position={index + 1} />
+        ))}
+      </ol>
 
-          <dl className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2 xl:grid-cols-4">
-            <div className="flex gap-3">
-              <Clock3 className="mt-0.5 size-4 shrink-0 text-gray-400" />
-              <div>
-                <dt className="font-medium text-gray-500">Start</dt>
-                <dd className="font-semibold text-black">
-                  <time dateTime={pass.pass_start}>
-                    {format(new Date(pass.pass_start), "dd. MMM yyyy @ HH:mm")}
-                  </time>
-                </dd>
-              </div>
-            </div>
-
-            <div className="flex gap-3">
-              <Clock3 className="mt-0.5 size-4 shrink-0 text-gray-400" />
-              <div>
-                <dt className="font-medium text-gray-500">End</dt>
-                <dd className="font-semibold text-black">
-                  <time dateTime={pass.pass_end}>
-                    {format(new Date(pass.pass_end), "dd. MMM yyyy @ HH:mm")}
-                  </time>
-                </dd>
-              </div>
-            </div>
-
-            <div className="flex gap-3">
-              <TrendingUp className="mt-0.5 size-4 shrink-0 text-gray-400" />
-              <div>
-                <dt className="font-medium text-gray-500">Max elevation</dt>
-                <dd className="font-semibold text-black">
-                  {formatDegrees(pass.max_elevation)}
-                </dd>
-              </div>
-            </div>
-
-            <div className="flex gap-3">
-              <Compass className="mt-0.5 size-4 shrink-0 text-gray-400" />
-              <div>
-                <dt className="font-medium text-gray-500">Azimuth</dt>
-                <dd className="font-semibold text-black">
-                  {formatDegrees(pass.pass_start_azimuth)} start ?{" "}
-                  {formatDegrees(pass.azimuth_at_max)} max
-                </dd>
-              </div>
-            </div>
-          </dl>
-        </li>
-      ))}
-    </ul>
+      {laterPasses.length > 0 && (
+        <details className="group border-b border-[#cbdada]">
+          <summary className="flex cursor-pointer list-none items-center justify-between py-5 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#256a8a] [&::-webkit-details-marker]:hidden">
+            <span>
+              Show {laterPasses.length} later{" "}
+              {laterPasses.length === 1 ? "pass" : "passes"}
+            </span>
+            <ArrowDown className="size-4 transition-transform group-open:rotate-180" />
+          </summary>
+          <ol className="grid border-t border-[#d9e4e3] sm:grid-cols-2 lg:grid-cols-4">
+            {laterPasses.map((pass, index) => (
+              <PassCard key={pass.id} pass={pass} position={index + 5} />
+            ))}
+          </ol>
+        </details>
+      )}
+    </div>
   );
 }

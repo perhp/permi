@@ -5,22 +5,24 @@ import { NavLink } from "./nav-link";
 
 export default function Header() {
   return (
-    <header className="relative border-b border-gray-100 z-10 bg-white">
-      <div className="flex items-center justify-between container h-14">
-        <Link href="/" className="flex items-center font-bold gap-1.5">
-          <SatelliteDish className="w-5 h-5" />{" "}
-          <span className="hidden sm:inline">permi</span>
+    <header className="sticky top-0 z-40 border-b border-[#d9e4e3]/80 bg-[#f7faf9]/90 backdrop-blur-xl">
+      <div className="container flex h-16 items-center justify-between">
+        <Link
+          href="/"
+          className="flex items-center gap-2.5 font-bold tracking-[-0.02em] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#256a8a]"
+        >
+          <span className="flex size-8 items-center justify-center rounded-full bg-[#10212b] text-white">
+            <SatelliteDish className="size-4" />
+          </span>
+          <span>permi</span>
+          <span className="hidden font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-[#5c6f76] md:inline">
+            Ground station
+          </span>
         </Link>
         <nav>
-          <ul className="flex gap-5 items-center">
-            <NavLink href="/" className="font-medium text-sm">
+          <ul className="flex items-center gap-4 sm:gap-6">
+            <NavLink href="/#passes" className="font-medium text-sm">
               Passes
-            </NavLink>
-            <NavLink href="/upcoming" className="font-medium text-sm">
-              Upcoming
-            </NavLink>
-            <NavLink href="/stats" className="font-medium text-sm">
-              Stats
             </NavLink>
             <NavLink href="/setup" className="font-medium text-sm">
               Setup
@@ -28,7 +30,8 @@ export default function Header() {
             <NavLink
               href="https://github.com/perhp/permi"
               target="_blank"
-              className="bg-gray-100 hover:bg-gray-100/75 p-2 rounded-full"
+              aria-label="View permi on GitHub"
+              className="rounded-full bg-[#e7efef] p-2 transition-colors hover:bg-[#d9e4e3]"
             >
               <GitHubLogoIcon className="w-5 h-5" />
             </NavLink>

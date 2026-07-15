@@ -2,23 +2,23 @@
 
 @layer base {
   :root {
-    --background: hsl(0 0% 100%);
-    --foreground: hsl(222.2 84% 4.9%);
+    --background: #f7faf9;
+    --foreground: #10212b;
 
-    --card: hsl(0 0% 100%);
-    --card-foreground: hsl(222.2 84% 4.9%);
+    --card: #ffffff;
+    --card-foreground: #10212b;
 
     --popover: hsl(0 0% 100%);
     --popover-foreground: hsl(222.2 84% 4.9%);
 
-    --primary: hsl(222.2 47.4% 11.2%);
+    --primary: #10212b;
     --primary-foreground: hsl(210 40% 98%);
 
     --secondary: hsl(210 40% 96.1%);
     --secondary-foreground: hsl(222.2 47.4% 11.2%);
 
-    --muted: hsl(210 40% 96.1%);
-    --muted-foreground: hsl(215.4 16.3% 46.9%);
+    --muted: #e7efef;
+    --muted-foreground: #5c6f76;
 
     --accent: hsl(210 40% 96.1%);
     --accent-foreground: hsl(222.2 47.4% 11.2%);
@@ -26,15 +26,22 @@
     --destructive: hsl(0 84.2% 60.2%);
     --destructive-foreground: hsl(210 40% 98%);
 
-    --border: hsl(214.3 31.8% 91.4%);
-    --input: hsl(214.3 31.8% 91.4%);
+    --border: #d9e4e3;
+    --input: #d9e4e3;
     --ring: hsl(222.2 84% 4.9%);
 
     --radius: 0.5rem;
+
+    --orbit: #256a8a;
+    --signal: #2e7d5b;
+    --sun: #e8a735;
+    --cloud: #e7efef;
   }
 }
 
 @theme inline {
+  --font-mono: var(--font-geist-mono);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 
@@ -81,10 +88,33 @@
 }
 
 @utility container {
+  width: min(100%, 90rem);
   margin-inline: auto;
-  padding-inline: 2rem;
+  padding-inline: clamp(1.25rem, 4vw, 3rem);
 }
 
 body {
-  @apply flex flex-col bg-white text-foreground min-h-screen overflow-y-scroll;
+  @apply flex flex-col bg-background text-foreground min-h-screen overflow-y-scroll antialiased;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--orbit) 24%, white);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
 }
