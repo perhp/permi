@@ -4,6 +4,7 @@ import PolarPlot from "@/app/_components/polar-plot";
 import { CDN_URL } from "@/lib/cdn-url";
 import { cn } from "@/lib/utils";
 import { Pass as PassModel } from "@/models/pass.model";
+import { estimateExitAzimuth } from "@/utils/estimate-exit-azimuth";
 import { getImagesOfGraphs } from "@/utils/get-images-of-graphs";
 import { getImagesWithoutGraphs } from "@/utils/get-images-without-graphs";
 import { getPassImageName } from "@/utils/get-pass-image-name";
@@ -150,6 +151,10 @@ export default function Pass({ pass }: Props) {
 
           <PolarPlot
             className="mx-auto sm:mx-0"
+            endAzimuth={estimateExitAzimuth(
+              Number(pass_start_azimuth),
+              Number(azimuth_at_max),
+            )}
             maxElevation={Number(max_elevation)}
             peakAzimuth={Number(azimuth_at_max)}
             peakLabel

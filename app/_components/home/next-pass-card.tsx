@@ -1,18 +1,13 @@
 "use client";
 
 import { UpcomingPass } from "@/models/upcoming-pass.model";
+import { estimateExitAzimuth } from "@/utils/estimate-exit-azimuth";
 import { format } from "date-fns";
 import PolarPlot from "../polar-plot";
 import CountdownBadge from "./countdown-badge";
 
 function formatDegrees(value: number) {
   return Number(value).toFixed(0);
-}
-
-// The pass track is symmetric about its peak, so the exit azimuth is the
-// entry azimuth mirrored across the azimuth at max elevation.
-function estimateExitAzimuth(startAzimuth: number, peakAzimuth: number) {
-  return (((2 * peakAzimuth - startAzimuth) % 360) + 360) % 360;
 }
 
 function Readout({ label, value, highlight = false }: {
