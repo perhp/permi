@@ -44,7 +44,7 @@ export default function LandingHero({ nextPass }: Props) {
       {nextPass ? (
         <NextPassCard pass={nextPass} />
       ) : (
-        <div className="panel min-w-[300px] flex-[0_1_380px] p-5.5">
+        <div className="panel min-w-75 flex-[0_1_460px] p-7">
           <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
             Next pass
           </div>
