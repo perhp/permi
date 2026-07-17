@@ -117,7 +117,7 @@ export default async function Page() {
               meta={`${String(passes.length).padStart(2, "0")} FILES`}
               title="Recent captures"
             />
-            <PassesList passes={passes} />
+            <PassesList collapsedCount={6} passes={passes} />
           </div>
         </section>
 

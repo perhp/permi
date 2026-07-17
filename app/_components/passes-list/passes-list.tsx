@@ -12,11 +12,17 @@ import { useState } from "react";
 import { RemoveScrollBar } from "react-remove-scroll-bar";
 
 type Props = {
+  collapsedCount?: number;
   passes: Pass[];
 };
 
-export default function PassesList({ passes }: Props) {
+export default function PassesList({ collapsedCount, passes }: Props) {
   const [activePass, setActivePass] = useState<Pass | null>(null);
+  const [showAll, setShowAll] = useState(false);
+
+  const isCollapsed =
+    collapsedCount !== undefined && !showAll && passes.length > collapsedCount;
+  const visiblePasses = isCollapsed ? passes.slice(0, collapsedCount) : passes;
 
   const getImage = (images: Pass["images"]) => {
     if (!images || images.length === 0) return null;
@@ -38,7 +44,7 @@ export default function PassesList({ passes }: Props) {
   return (
     <>
       <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {passes.map((pass) => {
+        {visiblePasses.map((pass) => {
           const satelliteName = getSatelliteName(pass);
           const imagesWithoutGraphs = getImagesWithoutGraphs(pass.images);
           const image = getImage(imagesWithoutGraphs);
@@ -84,6 +90,15 @@ export default function PassesList({ passes }: Props) {
           );
         })}
       </ul>
+      {isCollapsed && (
+        <button
+          type="button"
+          onClick={() => setShowAll(true)}
+          className="panel mt-5 w-full border-dashed py-3.5 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground transition-colors hover:border-accent/50 hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        >
+          Show all {passes.length} passes
+        </button>
+      )}
       <AnimatePresence>
         {activePass && (
           <>
