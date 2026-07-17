@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 
 type Props = {
   className?: string;
+  endAzimuth?: number | null;
   maxElevation: number;
   peakAzimuth: number;
   peakLabel?: boolean;
@@ -9,17 +10,23 @@ type Props = {
   startAzimuth?: number | null;
 };
 
-function polarPosition(azimuthDegrees: number, elevationDegrees: number) {
+function polarPoint(azimuthDegrees: number, elevationDegrees: number) {
   const azimuthRadians = (azimuthDegrees * Math.PI) / 180;
   const radius = ((90 - elevationDegrees) / 90) * 44;
   return {
-    left: `${50 + radius * Math.sin(azimuthRadians)}%`,
-    top: `${50 - radius * Math.cos(azimuthRadians)}%`,
+    x: 50 + radius * Math.sin(azimuthRadians),
+    y: 50 - radius * Math.cos(azimuthRadians),
   };
+}
+
+function polarPosition(azimuthDegrees: number, elevationDegrees: number) {
+  const { x, y } = polarPoint(azimuthDegrees, elevationDegrees);
+  return { left: `${x}%`, top: `${y}%` };
 }
 
 export default function PolarPlot({
   className,
+  endAzimuth = null,
   maxElevation,
   peakAzimuth,
   peakLabel = false,
@@ -29,6 +36,19 @@ export default function PolarPlot({
   const peak = polarPosition(Number(peakAzimuth), Number(maxElevation));
   const start =
     startAzimuth === null ? null : polarPosition(Number(startAzimuth), 0);
+  const end = endAzimuth === null ? null : polarPosition(Number(endAzimuth), 0);
+
+  // Quadratic Bézier from entry to exit whose midpoint (t = 0.5) lands
+  // exactly on the peak, approximating the sky track.
+  let track: string | null = null;
+  if (startAzimuth !== null && endAzimuth !== null) {
+    const entry = polarPoint(Number(startAzimuth), 0);
+    const apex = polarPoint(Number(peakAzimuth), Number(maxElevation));
+    const exit = polarPoint(Number(endAzimuth), 0);
+    const controlX = 2 * apex.x - (entry.x + exit.x) / 2;
+    const controlY = 2 * apex.y - (entry.y + exit.y) / 2;
+    track = `M ${entry.x} ${entry.y} Q ${controlX} ${controlY} ${exit.x} ${exit.y}`;
+  }
 
   const compassLabel =
     "absolute font-mono text-[8px] text-faint pointer-events-none";
@@ -59,11 +79,35 @@ export default function PolarPlot({
       <span className={`${compassLabel} right-[3px] top-1/2 -translate-y-1/2`}>
         E
       </span>
+      {track && (
+        <svg
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 size-full"
+          viewBox="0 0 100 100"
+        >
+          <path
+            d={track}
+            fill="none"
+            opacity="0.55"
+            stroke="var(--accent)"
+            strokeDasharray="3 3"
+            strokeWidth="1"
+            vectorEffect="non-scaling-stroke"
+          />
+        </svg>
+      )}
       {start && (
         <div
           className="absolute size-[7px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[oklch(0.6_0.12_155)]"
           style={start}
           title={`Acquisition of signal at ${Number(startAzimuth).toFixed(0)}° azimuth`}
+        />
+      )}
+      {end && (
+        <div
+          className="absolute size-[7px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[oklch(0.55_0.13_25)]"
+          style={end}
+          title={`Loss of signal near ${Number(endAzimuth).toFixed(0)}° azimuth`}
         />
       )}
       <div

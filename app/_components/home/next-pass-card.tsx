@@ -9,6 +9,12 @@ function formatDegrees(value: number) {
   return Number(value).toFixed(0);
 }
 
+// The pass track is symmetric about its peak, so the exit azimuth is the
+// entry azimuth mirrored across the azimuth at max elevation.
+function estimateExitAzimuth(startAzimuth: number, peakAzimuth: number) {
+  return (((2 * peakAzimuth - startAzimuth) % 360) + 360) % 360;
+}
+
 function Readout({ label, value, highlight = false }: {
   highlight?: boolean;
   label: string;
@@ -37,8 +43,13 @@ export default function NextPassCard({ pass }: { pass: UpcomingPass }) {
       </div>
       <div className="flex flex-wrap items-center gap-5">
         <PolarPlot
+          endAzimuth={estimateExitAzimuth(
+            Number(pass.pass_start_azimuth),
+            Number(pass.azimuth_at_max),
+          )}
           maxElevation={Number(pass.max_elevation)}
           peakAzimuth={Number(pass.azimuth_at_max)}
+          startAzimuth={Number(pass.pass_start_azimuth)}
         />
         <div className="min-w-40 flex-1">
           <div className="font-mono text-[17px] font-bold text-bright">
