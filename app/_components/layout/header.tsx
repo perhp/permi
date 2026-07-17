@@ -50,7 +50,7 @@ export default async function Header() {
       </div>
       <div className="border-t border-rule bg-panel-inset">
         <div className="container flex flex-wrap gap-x-5 gap-y-1 py-1.5 text-[10.5px] tracking-[0.08em] text-muted-foreground">
-          {isReporting ? <span className="text-accent">● ONLINE</span> : <span className="text-warn">● STANDBY</span>}
+          {isReporting ? <span className="text-accent">● ONLINE</span> : <span className="text-destructive">● OFFLINE</span>}
           <span className="hidden sm:inline">LAT 55.67 N · LON 12.57 E</span>
           <span className="hidden md:inline">ANT QFH · 137MHZ</span>
           {lastSample && <LastSampleBadge lastSample={lastSample} />}
