@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     "Weather images received from NOAA and Meteor satellites by a personal ground station in Denmark.",
 };
 
-export const revalidate = 15;
+export const dynamic = "force-dynamic";
 
 async function loadStats(cutoff: string) {
   const supabase = createServiceClient();

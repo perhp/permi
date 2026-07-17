@@ -1,6 +1,7 @@
 import { createServiceClient } from "@/lib/supabase";
 import { differenceInMinutes } from "date-fns";
 import Link from "next/link";
+import LastSampleBadge from "./last-sample-badge";
 import { NavLink } from "./nav-link";
 
 async function getLastSampleTime() {
@@ -21,9 +22,7 @@ async function getLastSampleTime() {
 
 export default async function Header() {
   const lastSample = await getLastSampleTime();
-  const minutesAgo = lastSample
-    ? Math.max(0, differenceInMinutes(new Date(), new Date(lastSample)))
-    : null;
+  const minutesAgo = lastSample ? Math.max(0, differenceInMinutes(new Date(), new Date(lastSample))) : null;
   const isReporting = minutesAgo !== null && minutesAgo < 20;
 
   return (
@@ -33,7 +32,6 @@ export default async function Header() {
           href="/"
           className="flex items-center gap-3 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
         >
-          <span className="size-[11px] rounded-full bg-accent shadow-[0_0_10px_var(--accent)]" />
           <span className="text-base font-bold tracking-[0.14em]">PERMI</span>
           <span className="hidden border-l border-border pl-3 text-[10px] tracking-[0.24em] text-muted-foreground sm:inline">
             GND&nbsp;STATION
@@ -52,21 +50,10 @@ export default async function Header() {
       </div>
       <div className="border-t border-rule bg-panel-inset">
         <div className="container flex flex-wrap gap-x-5 gap-y-1 py-1.5 text-[10.5px] tracking-[0.08em] text-muted-foreground">
-          {isReporting ? (
-            <span className="text-accent">● ONLINE</span>
-          ) : (
-            <span className="text-warn">● STANDBY</span>
-          )}
+          {isReporting ? <span className="text-accent">● ONLINE</span> : <span className="text-warn">● STANDBY</span>}
           <span className="hidden sm:inline">LAT 55.67 N · LON 12.57 E</span>
           <span className="hidden md:inline">ANT QFH · 137MHZ</span>
-          {lastSample && (
-            <span>
-              LAST SAMPLE{" "}
-              {new Date(lastSample).toISOString().slice(11, 16)}{" "}
-              UTC
-              <span className="animate-blink text-accent">_</span>
-            </span>
-          )}
+          {lastSample && <LastSampleBadge lastSample={lastSample} />}
         </div>
       </div>
     </header>
